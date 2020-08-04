@@ -342,11 +342,25 @@ body {
 						alert('No zones in this location!')
 						window.localStorage.setItem('choice',JSON.stringify(choiceOrigin))
 					}else{
+
+						//set the active status of buttons
 						$('.btn-loc.active').removeClass("active")
+						$('.btn-z.active').removeClass("active")
+						$('#zone0').addClass('active')
+
 						e.currentTarget.classList.add("active")
 						this.zones=getZones()
+						this.choice = choiceTemp
+
+						if (devLength().length==0){
+							alert('No devices in this zone!')
+							window.localStorage.setItem('choice',JSON.stringify(choiceOrigin))
+						}
+						this.numOfDevs=devLength()
+						for (i in this.numOfDevs){
+							$('#'+i).contents().find('#zoneController').click()
+						}
 					}
-					console.log(this)
 				},
 				changeZone:function(e){
 					// $('#content',window.parent.document).attr('src','location.html')
@@ -354,12 +368,13 @@ body {
 					var choiceOrigin = JSON.parse(window.localStorage.getItem('choice'))
 					var choiceTemp = {location:choiceOrigin.location,zone:e.currentTarget.id.substring(4,5),device:0}
 					window.localStorage.setItem('choice',JSON.stringify(choiceTemp))
-					this.choice=choiceTemp
+					
 
 					if (devLength().length==0){
-						alert('No devies in this zone!')
+						alert('No devices in this zone!')
 						window.localStorage.setItem('choice',JSON.stringify(choiceOrigin))
 					}else{
+						this.choice=choiceTemp
 						$('.btn-z.active').removeClass("active")
 						e.currentTarget.classList.add("active")
 						this.numOfDevs=devLength()
@@ -368,7 +383,6 @@ body {
 						}
 						
 					}
-					console.log(this)
 				}
 			}
 		})
@@ -517,24 +531,11 @@ body {
 
 </script>
 
-<script id="selectLocation">
-	$('.btn-z').click(function(){
-		$('.btn-z.active').removeClass("active")
-		this.classList.add("active")
-	})
-</script>
-
-<script id="selectLocation">
+<!-- <script id="changeLocation">
 	$('.btn-loc').click(function(){
-		$('.btn-loc.active').removeClass("active")
-		this.classList.add("active")
+		$('#content',window.parent.document).attr('src','location.html')
 	})
-</script>
-<script id="changeLocation">
-	// $('.btn-loc').click(function(){
-	// 	$('#content',window.parent.document).attr('src','location.html')
-	// })
-</script>
+</script> -->
 
 <script>
 	

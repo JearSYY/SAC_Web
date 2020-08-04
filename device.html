@@ -8,9 +8,7 @@
 <link rel="stylesheet" href="./css/bootstrap.css">
 
 <title>SAC2.0 Web - Smart control panel for your preferences</title>
-<script id="getParameter">
-  console.log(document.URL)
-</script>
+
 <style>
 [v-cloak] {
 	display: none !important;
@@ -206,6 +204,8 @@ header {
 
 <script id="getData">
 	
+
+
 	updateData()
 	function updateData(){
 		
@@ -224,30 +224,27 @@ header {
 
 		console.log('vue d is ')
 		console.log(vueD)
-	
-
-		
 	}
-
 	function getDevices(){
 		var devIndex = parseInt(window.parameter)
-		
+		var devices =[]
 		var choice = JSON.parse(window.localStorage.choice)
 		var primaryDev = JSON.parse(window.localStorage.primaryData).locations[choice.location].extenders[choice.zone].zones[0].devices
+		// console.log(primaryDev)
 		
-		var devices = []
 		var t = (devIndex+1)*4>primaryDev.length?primaryDev.length:(devIndex+1)*4
+		var b = devIndex*4
+
 	
-		for (var i =devIndex*4; i<t ; i++){
+		for (var i = b; i<t; i++){
 			
-			devices[i]=primaryDev[i]
-			// zones[Math.floor(i/4)][i%4].deviceBg = deviceBg[i%6]
-			// zones[Math.floor(i/4)][i%4].deviceBgC = deviceBgC[i%6]
+			devices[i%4]=primaryDev[i]
 			
 		}
 		return devices
 		
 	}
+
 
 	
 </script>
