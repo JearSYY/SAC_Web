@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="./css/bootstrap.css">
+<link rel="stylesheet" href="./css/sacweb.css">
+<title>Welcome to your IOT Zone</title>
+<style>
+body {
+	background-color: rgb(240, 240, 240);
+}
+
+.jumbotron {
+	background-image: url("./images/bg/bg-signin.jpg");
+	/* Full height */
+	height: 67%;
+	/* Center and scale the image nicely */
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+#login-form {
+	height: 75%;
+}
+
+#signin {
+	color: #007bff;
+	font-size: x-large;
+	font-weight: bold;
+	margin-bottom: 4rem;
+}
+
+.signInPrompt {
+	color: rgb(160, 160, 160);
+	font-size: small;
+	font-weight: bold;
+	letter-spacing: 1px;
+}
+</style>
+</head>
+<body>
+
+
+	<div class="container h-100">
+		<div class="row h-100">
+			<div class="jumbotron shadow-lg text-center  col-6 my-auto">
+				<div class="my-auto">
+					<p class="display-4 mx-auto text-white font-weight-bold">SAC
+						2.0</p>
+					<p class="display-4 mx-auto text-white font-weight-bold">Web</p>
+				</div>
+			</div>
+
+
+			<div class="col-4 rounded shadow-lg my-auto" id="login-form">
+				<form action="./index.html" class="py-5 px-4">
+					<p class="mt-4" id="signin">Sign In</p>
+					<div class="form-group mt-5 mb-4">
+						<label class="signInPrompt" for="inputEmail">EMAIL</label> <input
+							type="email" class="form-control" id="inputEmail"
+							aria-describedby="emailHelp">
+
+					</div>
+					<div class="form-group">
+						<label class="signInPrompt" for="inputPassword">PASSWORD</label> <input
+							type="password" class="form-control" id="inputPassword"
+							aria-describedby="emailHelp">
+
+					</div>
+					<div class="form-group d-flex">
+						<p class="mr-2" style="color: rgb(160, 160, 160);">New user?</p>
+						<a href="">Sign Up</a>
+					</div>
+
+					<button type="submit" class="btn btn-primary mb-2">Login
+						In</button>
+				</form>
+			</div>
+
+		</div>
+
+	</div>
+
+</body>
+
+<script src="./js/jquery.min.js"></script>
+<script src="./js/bootstrap.bundle.js"></script>
+</html>

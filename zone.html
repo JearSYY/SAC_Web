@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="./css/sacweb.css">
+<link rel="stylesheet" href="./css/bootstrap.css">
+
+<title>SAC2.0 Web - Smart control panel for your preferences</title>
+<script id="getParameter">
+
+</script>
+<style>
+[v-cloak] {
+	display: none !important;
+}
+body {
+	min-width: 1793px;
+	min-height: 920px;
+}
+
+.control-icon {
+	width: 35px;
+	height: 35px;
+}
+
+.control-icon:hover {
+	cursor: pointer;
+}
+
+.carousel {
+	width: 100%;
+}
+
+.header {
+	height: 25%;
+}
+
+.content {
+	height: 75%;
+}
+
+#content {
+	height: 100%;
+}
+
+.btn-z {
+	width: 16%;
+	text-align: center;
+	border: 3px solid transparent;
+	background-color: #fff;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+
+.zone-card {
+	flex-grow: 1;
+	flex-basis: 0;
+	height: 100%;
+	/* Used to control the responsive display
+	 min-width: ; */
+}
+
+#dev-carousel {
+	flex-grow: 4;
+	flex-basis: 0;
+	height: 100%;
+}
+
+.dev-control {
+	position: absolute;
+	z-index: 1;
+	height: 25%;
+	top: 0;
+	width: 40px;
+}
+
+.dev-ctrl-prev {
+	left: 0;
+	background: linear-gradient(to right, white, 30%, rgb(153, 204, 153));
+}
+
+.dev-ctrl-next {
+	right: 0;
+	background: linear-gradient(to left, white, 30%, rgb(153, 204, 153));
+}
+
+.zone-card-header {
+	height: 25%;
+	display: flex;
+	flex-direction: column;
+	color: white;
+}
+
+.command-list {
+	display: flex;
+	flex-direction: column;
+}
+
+.zone-name {
+	align-self: center;
+	margin-top: 2rem;
+	margin-bottom: 1rem;
+}
+
+.device-state {
+	align-self: center;
+	text-align: center;
+	height: 2rem;
+	margin-bottom: 0.5rem;
+}
+
+.dev-frame {
+	width: 100%;
+	height: 100%
+}
+
+.rename-shade {
+	position: absolute;
+	height: 56%;
+	top: 44%;
+	width: 100%;
+	background-color: #000;
+	opacity: 0.3;
+	display: none;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	color: white;
+	font-weight: bold;
+	z-index: 2;
+}
+
+
+</style>
+
+</head>
+<body class="bg-lightgray">
+	<div id="content">
+		<div class="header">
+			<div class="locations d-flex ml-5 pt-4 w-75  align-items-center">
+				<div id="loc-control-prev" class="mr-3">
+					<img src="./images/common icon/prev.png" class="control-icon"
+						alt="">
+				</div>
+				<div id="locations-carousel" class="carousel" data-interval="false">
+					<div class="carousel-inner">
+
+						<div class="carousel-item " v-for='(item1,i1) in locationsName'
+							:id="'location-item'+i1">
+							<button class="btn-loc btn btn-light mr-1 px-5"
+								v-for='(item2,i2) in locationsName[i1]'
+								:id="'location'+(i1*4+i2)" v-on:click="changeLocation">{{
+								item2 }}</button>
+						</div>
+					</div>
+				</div>
+
+				<div id="loc-control-next" class="ml-auto">
+					<img src="./images/common icon/next.png" class="control-icon"
+						alt="">
+				</div>
+
+			</div>
+
+			<div class="zones d-flex ml-5 mb-3 pt-4 w-75  align-items-center">
+				<div id="zones-carousel" class="carousel slide carousel-fade"
+					data-interval="false">
+					<div class="carousel-inner">
+						<div class="carousel-item" v-for='(item1,i1) in zones'
+							:id="'zone-item'+i1">
+							<button class="btn btn-light mr-1 btn-z "
+								v-for='(item2,i2) in zones[i1]' :id="'zone'+(i1*6+i2)"
+								v-on:click="changeZone">{{item2.zones[0].name}}</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div id="z-control-panel"
+				class="d-flex justify-content-center align-items-center mb-2">
+				<div id="z-control-prev" class="mr-3">
+					<img src="./images/common icon/prev.png" class="control-icon"
+						alt="">
+				</div>
+				<div id="z-indicators">
+					<span id="1" class="indicator z-indicator z-ind-active"></span> <span
+						id="2" class="indicator z-indicator"></span>
+				</div>
+				<div id="z-control-next" class="ml-3">
+					<img src="./images/common icon/next.png" class="control-icon"
+						alt="">
+				</div>
+			</div>
+		</div>
+
+		<div class="content d-flex">
+			<div class="zone-card card">
+				<div class="card-header zone-card-header px-2"
+					style="background-image: url('./images/bg/z-bg-g.jpg');">
+					<h2 class="card-title zone-name" v-cloak>{{zones[Math.floor(choice.zone/6)][Math.floor(choice.zone%6)].zones[0].name}}</h2>
+					
+					<!-- <h2 class="card-title zone-name">123</h2> -->
+
+					<div class="temp&humd align-self-end">
+
+						<img src="./images/common icon/temperature.png"
+							class="d-xl-inline-block d-none" alt=""><span
+							v-text="Math.round(zones[Math.floor(choice.zone/6)][Math.floor(choice.zone%6)].state.temperature)"></span>
+						<span>℃</span> <img src="./images/common icon/humidity.png"
+							class="d-xl-inline-block d-none" alt=""><span
+							v-text="Math.round(zones[Math.floor(choice.zone/6)][Math.floor(choice.zone%6)].state.humidity)"></span>
+						<span>%</span>
+					</div>
+
+
+				</div>
+				<div class="card-body">
+					<div class="device-state">
+						<span class="ml-2"
+							v-text="zones[Math.floor(choice.zone/6)][Math.floor(choice.zone%6)].zones[0].devices.length"></span>
+						<span class="d-md-inline-block d-none">devices</span>
+					</div>
+
+					<div class="command-list">
+
+						<div class="command">
+							<div class="command-icon-wrapper">
+								<img src="./images/command icon/p on.png" class="command-icon"
+									alt="">
+							</div>
+							<span class="command-text"> Turn on all devices </span>
+						</div>
+						<div class="command">
+							<div class="command-icon-wrapper">
+								<img src="./images/command icon/p off.png" class="command-icon"
+									alt="">
+							</div>
+							<span class="command-text"> Turn off all devices </span>
+						</div>
+						<div class="command">
+							<div id="add-dev" class="command-icon-wrapper">
+								<img src="./images/command icon/add.png" class="command-icon"
+									alt="">
+							</div>
+							<span class="command-text"> Add new device </span>
+						</div>
+						<div class="command">
+							<div class="command-icon-wrapper rename">
+								<img src="./images/command icon/rename.png" class="command-icon"
+									alt="">
+							</div>
+							<span class="command-text"> Rename device </span>
+						</div>
+						<div class="command">
+							<div class="command-icon-wrapper">
+								<img src="./images/command icon/remove.png" class="command-icon"
+									alt="">
+							</div>
+							<span class="command-text"> Remvoe device </span>
+						</div>
+					</div>
+
+
+				</div>
+			</div>
+
+			<div id="dev-carousel" class="carousel slide carousel-fade h-100"
+				data-interval="false">
+
+
+				<div id="dev-carousel-inner" class="carousel-inner h-100">
+
+					<div class="dev-carousel-item carousel-item h-100"
+						v-for="(item,i) in numOfDevs" :id="'dev-item'+i">
+						<iframe src="device.html" frameborder="0" class="dev-frame"
+							:id='i'></iframe>
+					</div>
+
+					<!-- <div class="dev-carousel-item carousel-item h-100 active">
+						<iframe src="device.html" frameborder="0" id="device1"
+							class="dev-frame"></iframe>
+					</div>
+
+					<div class="dev-carousel-item carousel-item h-100 ">
+						<iframe src="device.html" frameborder="0" id="device2"
+							class="dev-frame"></iframe>
+					</div> -->
+
+				</div>
+
+				<div class="dev-control d-flex dev-ctrl-prev">
+					<img src="./images/common icon/prev.png" alt=""
+						class="control-icon my-auto">
+				</div>
+				<div class="dev-control d-flex dev-ctrl-next">
+					<img src="./images/common icon/next.png" alt=""
+						class="control-icon my-auto">
+				</div>
+
+			</div>
+
+			<div class="rename-shade">
+				<h2>Which device do you want to rename?</h2>
+				<h4 id="cancel-rename"
+					class="border border-light mt-4 px-3 py-1 rounded">Cancel</h4>
+			</div>
+
+		</div>
+	</div>
+</body>
+
+<script src="./js/jquery.min.js"></script>
+<script src="./js/bootstrap.bundle.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+
+<script id="getData">
+	
+	updateData()
+	function updateData(){
+		
+		var vueL = new Vue({
+			el:'#content',
+			data:{
+				zones:getZones(),
+				locationsName:getLocationsName(),
+				//devices:getDevices(),
+				numOfDevs: devLength(),
+				choice:JSON.parse(window.localStorage.getItem('choice'))
+			},
+			methods:{
+				changeLocation:function(e){
+					// $('#content',window.parent.document).attr('src','location.html')
+					console.log(e.currentTarget.id)
+					var choiceOrigin = JSON.parse(window.localStorage.getItem('choice'))
+					var choiceTemp = {location:e.currentTarget.id.substring(8,9),zone:0,device:0}
+					window.localStorage.setItem('choice',JSON.stringify(choiceTemp))
+
+					if (getZones().length==0){
+						alert('No zones in this location!')
+						window.localStorage.setItem('choice',JSON.stringify(choiceOrigin))
+					}else{
+						$('.btn-loc.active').removeClass("active")
+						e.currentTarget.classList.add("active")
+						this.zones=getZones()
+					}
+					console.log(this)
+				},
+				changeZone:function(e){
+					// $('#content',window.parent.document).attr('src','location.html')
+					console.log(e.currentTarget.id)
+					var choiceOrigin = JSON.parse(window.localStorage.getItem('choice'))
+					var choiceTemp = {location:choiceOrigin.location,zone:e.currentTarget.id.substring(4,5),device:0}
+					window.localStorage.setItem('choice',JSON.stringify(choiceTemp))
+					this.choice=choiceTemp
+
+					if (devLength().length==0){
+						alert('No devies in this zone!')
+						window.localStorage.setItem('choice',JSON.stringify(choiceOrigin))
+					}else{
+						$('.btn-z.active').removeClass("active")
+						e.currentTarget.classList.add("active")
+						this.numOfDevs=devLength()
+						for (i in this.numOfDevs){
+							$('#'+i).contents().find('#zoneController').click()
+						}
+						
+					}
+					console.log(this)
+				}
+			}
+		})
+
+		console.log('vue l is ')
+		console.log(vueL)
+	
+
+		
+	}
+
+	//get locations' name
+	function getLocationsName(){
+		var primaryData = JSON.parse(window.localStorage.primaryData)
+		var choice = JSON.parse(window.localStorage.choice)
+		var locationsName =[]
+		for (var i = 0;i< primaryData.locations.length;i++){
+			if(i%4==0){
+				locationsName[Math.floor(i/4)]=[]
+			}
+			locationsName[Math.floor(i/4)][i%4]=primaryData.locations[i].name
+			
+		}
+		return locationsName
+	}
+
+	//get zone's infomation
+	function getZones(){
+		var primaryData = JSON.parse(window.localStorage.primaryData)
+		var choice = JSON.parse(window.localStorage.choice)
+		var deviceBg = JSON.parse(window.localStorage.deviceBg)
+		var deviceBgC = JSON.parse(window.localStorage.deviceBgC)
+		var zones = []
+		for (var i =0; i<primaryData.locations[choice.location].extenders.length;i++){
+			if(i%6==0){
+				zones[Math.floor(i/6)]=[]
+			}
+		
+			zones[Math.floor(i/6)][i%6]=primaryData.locations[choice.location].extenders[i]
+			zones[Math.floor(i/6)][i%6].deviceBg = deviceBg[i%6]
+			zones[Math.floor(i/6)][i%6].deviceBgC = deviceBgC[i%6]
+			
+		}
+		return zones
+	}
+
+	// function getDevices(){
+	// 	var primaryData = JSON.parse(window.localStorage.primaryData)
+	// 	var choice = JSON.parse(window.localStorage.choice)
+	// 	var devices = []
+	// 	for (var i =0; i<primaryData.locations[choice.location].extenders[choice.zone].zones[0].devices.length;i++){
+	// 		if(i%4==0){
+	// 			devices[Math.floor(i/4)]=[]
+	// 		}
+		
+	// 		devices[Math.floor(i/4)][i%4]=primaryData.locations[choice.location].extenders[choice.zone].zones[0].devices[i]
+	// 		// zones[Math.floor(i/4)][i%4].deviceBg = deviceBg[i%6]
+	// 		// zones[Math.floor(i/4)][i%4].deviceBgC = deviceBgC[i%6]
+			
+	// 	}
+	// 	console.log(devices)
+	// 	return devices
+		
+	// }
+
+	function devLength(){
+		var primaryData = JSON.parse(window.localStorage.primaryData)
+		var choice = JSON.parse(window.localStorage.choice)
+		var length = primaryData.locations[choice.location].extenders[choice.zone].zones[0].devices.length
+		var l = []
+		for (var i=0;i<Math.ceil(length/4);i++){
+			l[i]=i
+		}
+		return l
+	}
+
+	
+</script>
+
+
+<script id="loc-controls">
+	//transform the collection to array so that can get the index of the element easily.
+	var choice = JSON.parse(window.localStorage.getItem('choice'))
+
+	l1 = Math.floor(choice.location/4)
+	l2 = choice.location
+	z1 = Math.floor(choice.zone/4)
+	z2 = choice.zone%4
+	console.log(l2+' '+z2)
+
+	document.getElementById('location-item'+l1).classList.add("active")
+	document.getElementById('location'+l2).classList.add("active")
+	document.getElementById('zone-item'+z1).classList.add("active")
+	document.getElementById('zone'+z2).classList.add("active")
+	document.getElementById('dev-item0').classList.add("active")
+
+	$('#loc-control-prev').click(function(){
+		$('#locations-carousel').carousel('prev');
+	})
+	$('#loc-control-next').click(function(){
+		$('#locations-carousel').carousel('next');
+	})
+</script>
+
+
+<script id="z-control-panel">
+	$('#z-control-prev').click(function(){
+		$('#zones-carousel').carousel('prev');
+
+		switchState('prev');
+
+	})
+	$('#z-control-next').click(function(){
+		$('#zones-carousel').carousel('next');
+		switchState('next');
+
+	})
+
+	function switchState(t){
+		var activeIndicator = $('.z-ind-active')
+		var zIndicators = $('#z-indicators')
+		var index = $('#z-indicators span').index(activeIndicator)
+
+		if(t=="prev"){
+			var nextIndex = (index==0)?zIndicators.children().length-1:index-1
+			console.log("the next index is "+nextIndex)
+		}else{
+			var nextIndex = (index+1==zIndicators.children().length)?0:index+1
+		}
+
+		activeIndicator.removeClass("z-ind-active")
+		zIndicators.children().eq(nextIndex).addClass("z-ind-active")
+	}
+
+
+
+	$('.z-indicator').click(function(){
+		var index = $('#z-indicators span').index(this)
+		console.log(index)
+		$('#zones-carousel').carousel(index);
+
+		//to toggle acitve state
+		$('.z-ind-active').removeClass("z-ind-active")
+		this.classList.add("z-ind-active")
+	})
+
+</script>
+
+<script id="selectLocation">
+	$('.btn-z').click(function(){
+		$('.btn-z.active').removeClass("active")
+		this.classList.add("active")
+	})
+</script>
+
+<script id="selectLocation">
+	$('.btn-loc').click(function(){
+		$('.btn-loc.active').removeClass("active")
+		this.classList.add("active")
+	})
+</script>
+<script id="changeLocation">
+	// $('.btn-loc').click(function(){
+	// 	$('#content',window.parent.document).attr('src','location.html')
+	// })
+</script>
+
+<script>
+	
+	var childFrame = document.getElementsByClassName('dev-frame')
+	for (var i=0;i<childFrame.length;i++){
+		childFrame[i].contentWindow.parameter = childFrame[i].id
+	}
+	console.log(childFrame)
+
+
+</script>
+
+<script id="dev-controls">
+	$('.dev-ctrl-prev').click(function(){
+		console.log("prev")
+		$('#dev-carousel').carousel('prev')
+	})
+	$('.dev-ctrl-next').click(function(){
+		console.log("next")
+		$('#dev-carousel').carousel('next')
+	})
+</script>
+
+<script id="clickCmd">
+	$('.command-icon-wrapper').mousedown(function(){
+		this.style.border="5px solid #00e1ff";
+	})
+
+	$('.command-icon-wrapper').mouseup(function(){
+		this.style.border="";
+	})
+
+</script>
+
+<script id="add-dev">
+	$('#add-dev').click(function(){
+		window.parent.location.href="add-device.html"
+	})
+</script>
+
+
+<script id="rename">
+	$('.rename').click(function(){
+		$('.rename-shade').css('display','flex')
+		
+		var devFrames = $('.dev-frame')
+		
+		for(var i=0;i<devFrames.length;i++){
+			
+			$('.dev-icon', devFrames[i].contentWindow.document).css('cursor','pointer')
+		}
+		
+	})
+
+	$('#cancel-rename').hover(function(){
+		this.style.cursor='pointer'
+	})
+	$('#cancel-rename').click(function(){
+		$('.rename-shade').css("display",'none')
+	})
+</script>
+
+
+
+
+</html>

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="./css/bootstrap.css">
+<link rel="stylesheet" href="./css/sacweb.css">
+<title>SAC2.0 Web - Smart control panel for your preferences</title>
+
+<style>
+#content {
+	height: 100%;
+}
+
+#shade {
+	z-index: 2;
+	width: 100%;
+	height: 100%;
+	background-color: #000;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 2;
+	opacity: 0.3;
+	display: none;
+}
+
+#navbar-toggler:hover {
+	cursor: pointer
+}
+
+.time {
+	position: fixed;
+	top: 50px;
+	right: 50px;
+}
+</style>
+</head>
+
+<body>
+	<div id="wrapper" class="d-flex h-100">
+		<div id="sidebar" class="bg-dark h-100" style="z-index: 3;">
+			<nav class="nav flex-column align-items-center mt-4">
+
+
+				<div style="border-radius: 50%; background-color: #02adc4;"
+					class="sidebar-icon mx-3" id="main">
+					<img src="./images/common icon/user.png" id="main"
+						class="nav-item nav-link px-2">
+				</div>
+
+				<img src="./images/common icon/community.png" id="community"
+					class="nav-item nav-link sidebar-icon"> <img
+					src="./images/common icon/extender.png" id="extender"
+					class="nav-item nav-link sidebar-icon"> <img
+					src="./images/common icon/voice command list.png"
+					id="voice-command" class="nav-item nav-link sidebar-icon"> <img
+					src="./images/common icon/time schedule.png" id="schedule"
+					class="nav-item nav-link sidebar-icon"> <img
+					src="./images/common icon/user manual.png" id="user-manual"
+					class="nav-item nav-link sidebar-icon"> <img
+					src="./images/common icon/privacy & policy.png" id="privacy"
+					class="nav-item nav-link sidebar-icon"> <img
+					src="./images/common icon/contact us.png" id="contact"
+					class="nav-item nav-link sidebar-icon"> <img
+					src="./images/common icon/agreement.png" id="agreement"
+					class="nav-item nav-link sidebar-icon"> <img
+					src="./images/common icon/sign out.png" id="signout"
+					class="nav-item nav-link sidebar-icon"> <img
+					src="./images/common icon/troubleshooting.png" id="troubleshooting"
+					class="nav-item nav-link sidebar-icon">
+
+				<nav class="navbar navbar-dark bg-dark">
+					<button class="navbar-toggler border-0 px-0" id="navbar-toggler"
+						type="button" aria-controls="navbarToggleExternalContent"
+						aria-expanded="false" aria-label="Toggle navigation">
+						<span class="navbar-toggler-icon"></span>
+					</button>
+				</nav>
+				<!-- data-toggle="collapse" data-target="#navbarNames" -->
+
+			</nav>
+		</div>
+		<div class="flex-column bg-dark h-100 pl-2" id="navbarNames"
+			style="z-index: 3; display: none;">
+
+			<span id="userName" class="text-white d-block sidebar-name"
+				style="margin-top: 2.5rem; margin-bottom: 45px;">{{ userName
+				}}</span> <span class="text-white d-block sidebar-name">Community</span> <span
+				class="text-white d-block sidebar-name">Extender</span> <span
+				class="text-white d-block sidebar-name text-nowrap">Voice
+				Command List</span> <span class="text-white d-block sidebar-name">Smart
+				Profile</span> <span class="text-white d-block sidebar-name">User
+				manua</span> <span class="text-white d-block sidebar-name">Privacy &
+				Policy</span> <span class="text-white d-block sidebar-name">Contact
+				us</span> <span class="text-white d-block sidebar-name">Agreement</span> <span
+				class="text-white d-block sidebar-name" style="margin-bottom: 38px;">Signout</span>
+			<span class="text-white d-block sidebar-name">Troubleshooting</span>
+
+		</div>
+
+		<div id="shade"></div>
+		<iframe src="location.html" id="content" class="h-100 w-100"></iframe>
+
+		<div class="time d-md-flex d-none align-items-center font-weight-bold">
+			<span id="timer"></span>
+			<div class="temperature d-flex align-items-center ml-3">
+				<div class="mr-2 d-flex align-items-center flex-column">
+					<img src="./images/common icon/temp.png" sid="temp-icon" alt="">
+					<small>Outdoor</small>
+				</div>
+
+				<span>28</span> <span>℃</span>
+			</div>
+
+		</div>
+	</div>
+
+</body>
+
+<script src="./js/jquery.min.js"></script>
+<script src="./js/bootstrap.bundle.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+
+
+<script id="navbar-control" type="text/javascript">
+ 
+  var shade = document.getElementById("shade")
+  var content = document.getElementById("content")
+  var navbarNames = document.getElementById("navbarNames")
+  var toggler = document.getElementById("navbar-toggler")
+  
+  $('#navbar-toggler').click(function(){
+    if (navbarNames.style.display=='block'){
+    	navbarNames.style.display='none';
+    }else{
+      navbarNames.style.display='block';
+    }
+    if (shade.style.display=='block'){
+    	shade.style.display='none';
+    }else{
+      shade.style.display='block';
+    }
+  })
+
+
+  $('#shade').click(function(){
+    this.style.display='none';
+    navbarNames.style.display='none';
+  })
+
+  // Handle the clicks on the sidebar
+  $('#community').click(function(){
+    $('#content').attr('src','community.html')
+  })
+  $('#voice-command').click(function(){
+    $('#content').attr('src','voice.html')
+  })
+  $('#main').click(function(){
+    $('#content').attr('src','location.html')
+  })
+	$('#schedule').click(function(){
+		$('#content').attr('src','schedule.html')
+	})
+
+
+  
+</script>
+
+<script id="time">
+	var timer = document.getElementById("timer")
+	var id = setInterval(updateTime, 1000);
+
+	
+	console.log("here is timeload")
+	var date1 = new Date()
+	var timeString = date1.getHours() + ":" + (date1.getMinutes()<10?"0":"")
+	+ date1.getMinutes() 
+	timer.innerHTML= timeString
+
+	function updateTime() {
+		var date2 = new Date()
+		
+		timeString = date2.getHours() + ":" + (date2.getMinutes()<10?"0":"")
+		+ date2.getMinutes()
+		timer.innerHTML= timeString
+	}
+</script>
+
+<script id="getData">
+	var xhttp = new XMLHttpRequest()
+  xhttp.open('GET','https://conexumhome.connectble.com/v6/me',true)
+  xhttp.setRequestHeader("Content-type", "application/Json");
+  xhttp.setRequestHeader("Authorization", "MT5dct51Y4YAmEyPsq0pWSINciE9kWrK9YobLJ8Hk32kPyFQo9NgCqoWKDj7G75O");
+  xhttp.send()
+  xhttp.onreadystatechange = function() {
+    primaryData = JSON.parse(xhttp.response)
+    console.log(primaryData)
+		window.localStorage.setItem('primaryData',JSON.stringify(primaryData))
+		
+		new Vue({
+			el:'#userName',
+			data:{
+				userName:primaryData.user.id
+			}
+		})
+	};
+
+	var choice = {
+		location:5,
+		zone:1,
+		device:0,
+	}
+
+	var deviceBg=['./images/bg/z-bg-r.jpg','./images/bg/z-bg-g.jpg','./images/bg/z-bg-b.jpg','./images/bg/z-bg-y.jpg','./images/bg/z-bg-v.jpg','./images/bg/z-bg-p.jpg']
+	var deviceBgC = ['rgb(255, 102, 102)','rgb(153, 204, 153)','rgb(153, 153, 255)','rgb(204, 204, 102)','rgb(153, 102, 204)','rgb(255, 153, 255)']
+
+	window.localStorage.setItem('choice',JSON.stringify(choice))
+	window.localStorage.setItem('deviceBg',JSON.stringify(deviceBg))
+	window.localStorage.setItem('deviceBgC',JSON.stringify(deviceBgC))
+
+	//check whehter local storage supported
+	if(!window.localStorage){
+		//alert("not supported local storage!")
+	}else{
+		//alert("supported local storage")
+
+
+	}
+
+</script>
+
+
+
+
+</html>

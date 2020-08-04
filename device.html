@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="./css/sacweb.css">
+<link rel="stylesheet" href="./css/bootstrap.css">
+
+<title>SAC2.0 Web - Smart control panel for your preferences</title>
+<script id="getParameter">
+  console.log(document.URL)
+</script>
+<style>
+[v-cloak] {
+	display: none !important;
+}
+
+body {
+	min-width: 1432px;
+	min-height: 680px;
+}
+
+#content {
+	display: flex;
+	flex-direction: row;
+	height: 100%;
+}
+
+.control-icon {
+	width: 35px;
+	height: 35px;
+}
+
+.control-icon:hover {
+	cursor: pointer;
+}
+
+.carousel {
+	width: 100%;
+}
+
+header {
+	height: 26%;
+}
+
+.content {
+	height: 74%;
+}
+
+.device-card {
+	width: 24.5%;
+	height: 100%
+}
+
+.device-card-header {
+	height: 25%;
+	display: flex;
+	flex-direction: column;
+	color: white;
+}
+
+.device-card-header {
+	align-items: center;
+	justify-content: center;
+}
+
+.cmd-control {
+	width: 100%;
+	background: linear-gradient(white, 60%, #00e1ff);
+	position: absolute;
+	height: 50px;
+}
+
+.cmd-ctrl-prev {
+	top: 25%;
+}
+
+.cmd-ctrl-next {
+	bottom: 0;
+}
+</style>
+
+</head>
+<body>
+	<div id="content">
+		<div id="zoneController" @click="changeZone" style="display: none;"></div>
+		<div class="device-card card" v-for="(item,i) in devices">
+			<div class="card-header device-card-header"
+				style="background-color: rgb(153, 204, 153);">
+				<img src="./images/device icon/fan.png" class="dev-icon" alt="">
+				<span v-cloak>{{item.name}}</span>
+			</div>
+			<div class="card-body px-0 pb-0">
+				<div class="cmd-control cmd-ctrl-prev d-none"
+					style="background: linear-gradient(#00e1ff, 60%, white);">
+					<img src="./images/common icon/up.png" class="control-icon m-auto"
+						alt="">
+				</div>
+				<div id="cmd-carousel" class="carousel ml-3 mt-4"
+					data-interval="false">
+					<div id="cmd-carousel-inner" class="carousel-inner pt-3">
+						<div class="cmd-carousel-item carousel-item active">
+
+							<div class="command">
+								<div class="command-icon-wrapper">
+									<img src="./images/command icon/p on.png" class="command-icon"
+										alt="">
+								</div>
+								<span class="command-text"> Power on </span>
+							</div>
+
+							<div class="command">
+								<div class="command-icon-wrapper">
+									<img src="./images/command icon/p on.png" class="command-icon"
+										alt="">
+								</div>
+								<span class="command-text"> Power on </span>
+							</div>
+
+							<div class="command">
+								<div class="command-icon-wrapper">
+									<img src="./images/command icon/p on.png" class="command-icon"
+										alt="">
+								</div>
+								<span class="command-text"> Power on </span>
+							</div>
+
+							<div class="command">
+								<div class="command-icon-wrapper">
+									<img src="./images/command icon/p on.png" class="command-icon"
+										alt="">
+								</div>
+								<span class="command-text"> Power on </span>
+							</div>
+
+							<div class="command">
+								<div class="command-icon-wrapper">
+									<img src="./images/command icon/p on.png" class="command-icon"
+										alt="">
+								</div>
+								<span class="command-text"> Power on </span>
+							</div>
+
+						</div>
+
+						<div class="cmd-carousel-item carousel-item">
+
+							<div class="command">
+								<div class="command-icon-wrapper">
+									<img src="./images/command icon/p off.png" class="command-icon"
+										alt="">
+								</div>
+								<span class="command-text"> Power off </span>
+							</div>
+
+							<div class="command">
+								<div class="command-icon-wrapper">
+									<img src="./images/command icon/p off.png" class="command-icon"
+										alt="">
+								</div>
+								<span class="command-text"> Power off </span>
+							</div>
+
+						</div>
+
+						<div class="cmd-carousel-item carousel-item">
+
+							<div class="command">
+								<div class="command-icon-wrapper">
+									<img src="./images/command icon/p off.png" class="command-icon"
+										alt="">
+								</div>
+								<span class="command-text"> Power 3 </span>
+							</div>
+
+							<div class="command">
+								<div class="command-icon-wrapper">
+									<img src="./images/command icon/p off.png" class="command-icon"
+										alt="">
+								</div>
+								<span class="command-text"> Power off </span>
+							</div>
+
+						</div>
+
+					</div>
+
+				</div>
+				<div class="cmd-control cmd-ctrl-next d-flex">
+
+					<img src="./images/common icon/down.png"
+						class="control-icon m-auto" alt="">
+				</div>
+
+			</div>
+
+		</div>
+
+	</div>
+</body>
+
+<script src="./js/jquery.min.js"></script>
+<script src="./js/bootstrap.bundle.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+
+<script id="getData">
+	
+	updateData()
+	function updateData(){
+		
+		var vueD = new Vue({
+			el:'#content',
+			data:{
+				devices:getDevices(),
+				choice:JSON.parse(window.localStorage.getItem('choice'))
+			},
+			methods:{
+				changeZone(){
+					this.devices=getDevices()
+				}
+			}
+		})
+
+		console.log('vue d is ')
+		console.log(vueD)
+	
+
+		
+	}
+
+	function getDevices(){
+		var devIndex = parseInt(window.parameter)
+		
+		var choice = JSON.parse(window.localStorage.choice)
+		var primaryDev = JSON.parse(window.localStorage.primaryData).locations[choice.location].extenders[choice.zone].zones[0].devices
+		
+		var devices = []
+		var t = (devIndex+1)*4>primaryDev.length?primaryDev.length:(devIndex+1)*4
+	
+		for (var i =devIndex*4; i<t ; i++){
+			
+			devices[i]=primaryDev[i]
+			// zones[Math.floor(i/4)][i%4].deviceBg = deviceBg[i%6]
+			// zones[Math.floor(i/4)][i%4].deviceBgC = deviceBgC[i%6]
+			
+		}
+		return devices
+		
+	}
+
+	
+</script>
+
+<script id="cmd-controls">
+	var length = $('#cmd-carousel-inner').children().length
+
+	$('.cmd-ctrl-prev').click(function(){
+		var index = $('#cmd-carousel-inner .cmd-carousel-item').index($('.cmd-carousel-item.active'))
+		console.log(index)
+		$('#cmd-carousel').carousel('prev')
+		if(index==1){
+			this.classList.replace("d-flex","d-none")
+		}
+		else{
+			this.classList.replace("d-none","d-flex")
+		}
+		if(index==length-1){
+			$('.cmd-ctrl-next').addClass("d-flex")
+			$('.cmd-ctrl-next').removeClass("d-none")
+		}
+	})
+
+	$('.cmd-ctrl-next').click(function(){
+		var index = $('#cmd-carousel-inner .cmd-carousel-item').index($('.cmd-carousel-item.active'))
+		$('#cmd-carousel').carousel('next')
+		console.log(index)
+		if(index==length-2){
+			
+			this.classList.replace("d-flex","d-none")
+		}
+		else{this.classList.replace("d-none","d-flex")}
+		if(index==0){
+			$('.cmd-ctrl-prev').addClass("d-flex")
+			$('.cmd-ctrl-prev').removeClass("d-none")
+		}
+	})
+	
+</script>
+
+<script>
+  
+</script>
+
+<script id="clickCmd">
+	$('.command-icon-wrapper').mousedown(function(){
+		this.style.border="5px solid #00e1ff";
+	})
+
+	$('.command-icon-wrapper').mouseup(function(){
+		this.style.border="";
+	})
+
+  $
+
+</script>
+
+<script id="renameDeivce">
+  $('.dev-icon').click(function(){
+    $('#content', window.parent.parent.document).attr('src','rename.html')
+    this.style.cursor="default"
+  })
+</script>
+
+</html>

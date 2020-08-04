@@ -1,0 +1,93 @@
+/*!
+ * sacweb v1.0.0 
+ * Copyright 2020- JearFSA Authors
+ * Copyright 2020- Remotec Technology Ltd., Hong Kong
+ */
+html {
+	height: 100%;
+}
+
+body {
+	height: 100%;
+}
+
+.sidebar-icon {
+	margin-bottom: 0.5rem;
+}
+
+.sidebar-icon:hover {
+	cursor: pointer;
+}
+
+.sidebar-name {
+	margin-bottom: 34px;
+	margin-right: 20px;
+}
+
+button:hover {
+	cursor: pointer;
+}
+
+.indicator {
+	display: inline-block;
+	width: 15px;
+	height: 15px;
+	margin-right: 10px;
+	border-radius: 50%;
+	background-color: #c5c6c7;
+}
+
+.loc-ind-active, .z-ind-active {
+	background-color: #00e1ff;
+}
+
+.bg-lightgray {
+	background-color: rgb(220, 220, 220);
+}
+
+.btn-loc {
+	/* To indicate the locaitons and zones */
+	font-weight: bold;
+	border: 3px solid transparent;
+}
+
+.btn-z.active, .btn-loc.active {
+	border: 3px solid #00e1ff;
+}
+
+.zone-card-header {
+	background-position: 0 80%;
+	background-repeat: no-repeat;
+	background-size: cover;
+}
+
+.command {
+	margin-left: 6%;
+	margin-bottom: 20px;
+	display: flex;
+	align-items: center;
+}
+
+.command-icon-wrapper {
+	border-radius: 50%;
+	width: 60px;
+	height: 60px;
+	box-shadow: 0rem 0rem 1rem rgba(0, 0, 0, 0.3) !important;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-right: 20px;
+}
+
+.command-icon-wrapper:hover {
+	cursor: pointer;
+}
+
+.input-text {
+	border: none;
+}
+
+.input-text:focus {
+	border: none;
+	outline: none;
+}

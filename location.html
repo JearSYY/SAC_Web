@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="./css/bootstrap.css">
+<link rel="stylesheet" href="./css/sacweb.css">
+<title>SAC2.0 Web - Smart control panel for your preferences</title>
+<style>
+body {
+	min-width: 1793px;
+	min-height: 920px;
+}
+
+.btn-light:focus {
+	box-shadow: none;
+	background-color: #fff;
+}
+
+.header {
+	width: 100%;
+	height: 16%;
+}
+
+.zone {
+	border-radius: 15px;
+	height: 300px;
+}
+
+.zone:hover {
+	cursor: pointer;
+}
+
+.zones {
+	height: 84%;
+}
+
+.devices {
+	border-radius: 0 0 15px 15px;
+	overflow: hidden;
+	padding-right: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.device-icon {
+	width: 90px;
+	height: 90px;
+	margin-right: 10px;
+}
+</style>
+</head>
+<body class="bg-lightgray">
+	<div id="content">
+		<div class="header w-100">
+
+			<div class="locations d-flex ml-5 mb-3 pt-5">
+				<div id="locations-carousel" class="carousel" data-interval="false">
+					<div class="carousel-inner">
+
+						<div class="carousel-item " v-for='(item1,i1) in locationsName'
+							:id="'location-item'+i1">
+							<button class="btn btn-light mr-1 btn-loc px-5"
+								v-for='(item2,i2) in locationsName[i1]'
+								:id="'location'+(i1*4+i2)" v-on:click="changeLocation">{{
+								item2 }}</button>
+							<!-- <button class="btn btn-light mr-1 btn-loc px-5">office</button> -->
+						</div>
+
+
+					</div>
+				</div>
+
+				<button class="btn btn-light ml-1 px-5 font-weight-bold">Edit
+					Location</button>
+			</div>
+
+			<div id="loc-indicators" class="d-flex justify-content-center">
+				<span id="1" class="indicator loc-indicator loc-ind-active"></span>
+				<span id="2" class="indicator loc-indicator"></span>
+			</div>
+			<hr class="my-2" style="height: 5px; background-color: white;">
+		</div>
+
+
+		<div class="zones w-100">
+			<div id="zones-carousel"
+				class="carousel slide carousel-fade px-5 pt-4" data-interval="false">
+
+				<div id="zones" class="carousel-inner">
+					<div class="carousel-item" v-for='(item,i1) in zones'
+						:id="'zone-item'+i1">
+						<div class="row row-cols-3">
+							<div class="col mb-4" v-for='(item,i2) in zones[i1]'>
+								<div class="card zone text-white" :id="'zone'+(i1*6+i2)">
+									<div class="card-header zone-card-header px-2"
+										:style="{'background-image': 'url('+item.deviceBg+')'}">
+										<h5 class="card-title text-white ml-2">{{
+											item.zones[0].name }}</h5>
+										<hr
+											style="background-color: white; color: white; height: 1px;">
+										<div
+											class="info-detail d-flex align-items-center justify-content-between">
+											<div>
+												<span class="ml-2">{{item.zones[0].devices.length}}</span> <span
+													class="d-md-inline-block d-none">devices</span>
+												<!-- <span class="d-xl-inline-block d-none">powered on</span> -->
+											</div>
+											<div>
+												<img src="./images/common icon/temperature.png"
+													class="d-xl-inline-block d-none" alt=""> <span>{{Math.round(item.state.temperature)}}</span>
+												<span>℃</span> <img src="./images/common icon/humidity.png"
+													class="d-xl-inline-block d-none" alt=""> <span>{{Math.round(item.state.humidity)}}</span>
+												<span>%</span>
+											</div>
+
+										</div>
+									</div>
+									<div class="card-body devices"
+										:style="{'background-color': item.deviceBgC}">
+										<a href="#" class="float-left"><img
+											src="./images/device icon/fan.png" class="device-icon" alt="">
+										</a> <a href="#" class="float-left"><img
+											src="./images/device icon/led_tv.png" class="device-icon"
+											alt=""> </a> <a href="#" class="float-left"><img
+											src="./images/device icon/split_ac.png" class="device-icon"
+											alt=""> </a> <a href="#" class="float-left"><img
+											src="./images/device icon/light.png" class="device-icon"
+											alt=""> </a>
+
+									</div>
+								</div>
+							</div>
+							<!-- <div class="col mb-4">
+								<div class="card zone">
+									<div class="card-header zone-card-header px-2"
+										style="background-image: url('./images/bg/z-bg-g.jpg');">
+										<h5 class="card-title text-white">Card title</h5>
+										<hr style="background-color: white; color: white; height: 1px;">
+									</div>
+									<div class="card-body devices"
+										style="background-color: rgb(153, 204, 153);">
+										<p class="card-text">This is a longer ceT a little bit
+											longer.</p>
+										<p class="card-text">
+											<small class="text-muted">Last updated 3 mins ago</small>
+										</p>
+									</div>
+								</div>
+							</div>
+							<div class="col mb-4">
+								<div class="card zone">
+									<div class="card-header zone-card-header px-2"
+										style="background-image: url('./images/bg/z-bg-b.jpg');">
+										<h5 class="card-title text-white">Card title</h5>
+										<hr style="background-color: white; color: white; height: 1px;">
+									</div>
+									<div class="card-body devices"
+										style="background-color: rgb(153, 153, 255);">
+										<p class="card-text">This is a longer ceT a little bit
+											longer.</p>
+										<p class="card-text">
+											<small class="text-muted">Last updated 3 mins ago</small>
+										</p>
+									</div>
+								</div>
+							</div>
+							<div class="col mb-4">
+								<div class="card zone">
+									<div class="card-header zone-card-header px-2"
+										style="background-image: url('./images/bg/z-bg-y.jpg');">
+										<h5 class="card-title text-white">Card title</h5>
+										<hr style="background-color: white; color: white; height: 1px;">
+									</div>
+									<div class="card-body devices"
+										style="background-color: rgb(204, 204, 102);">
+										<p class="card-text">This is a longer ceT a little bit
+											longer.</p>
+										<p class="card-text">
+											<small class="text-muted">Last updated 3 mins ago</small>
+										</p>
+									</div>
+								</div>
+							</div>
+							<div class="col mb-4">
+								<div class="card zone">
+									<div class="card-header zone-card-header px-2"
+										style="background-image: url('./images/bg/z-bg-v.jpg');">
+										<h5 class="card-title text-white">Card title</h5>
+										<hr style="background-color: white; color: white; height: 1px;">
+									</div>
+									<div class="card-body devices"
+										style="background-color: rgb(153, 102, 204);">
+										<p class="card-text">This is a longer ceT a little bit
+											longer.</p>
+										<p class="card-text">
+											<small class="text-muted">Last updated 3 mins ago</small>
+										</p>
+									</div>
+								</div>
+							</div>
+							<div class="col mb-4">
+								<div class="card zone">
+									<div class="card-header zone-card-header px-2"
+										style="background-image: url('./images/bg/z-bg-p.jpg');">
+										<h5 class="card-title text-white">Card title</h5>
+										<hr style="background-color: white; color: white; height: 1px;">
+									</div>
+									<div class="card-body devices"
+										style="background-color: rgb(255, 153, 255);">
+										<p class="card-text">This is a longer ceT a little bit
+											longer.</p>
+										<p class="card-text">
+											<small class="text-muted">Last updated 3 mins ago</small>
+										</p>
+									</div>
+								</div>
+							</div> -->
+						</div>
+
+
+					</div>
+					<!-- <div class="carousel-item">
+						<div class="row row-cols-3">
+							<div class="col mb-4">
+								<div class="card zone text-white">
+									<div class="card-header zone-card-header px-2"
+										style="background-image: url('./images/bg/z-bg-r.jpg');">
+										<h5 class="card-title text-white ml-2">Page2</h5>
+										<hr style="background-color: white; color: white; height: 1px;">
+										<div
+											class="info-detail d-flex align-items-center justify-content-between">
+											<div>
+												<span class="ml-2">4/10</span> <span
+													class="d-md-inline-block d-none">devices</span> <span
+													class="d-xl-inline-block d-none">powered on</span>
+											</div>
+											<div>
+												<img src="./images/common icon/temperature.png"
+													class="d-xl-inline-block d-none" alt=""> <span>32</span>
+												<span>℃</span> <img src="./images/common icon/humidity.png"
+													class="d-xl-inline-block d-none" alt=""> <span>55</span>
+												<span>%</span>
+											</div>
+										</div>
+									</div>
+									<div class="card-body devices"
+										style="background-color: rgb(255, 102, 102);">
+										<a href="#"><img src="./images/device icon/fan.png"
+											class="device-icon" alt=""> </a> <a href="#"><img
+											src="./images/device icon/led_tv.png" class="device-icon"
+											alt=""> </a> <a href="#"><img
+											src="./images/device icon/split_ac.png" class="device-icon"
+											alt=""> </a> <a href="#"><img
+											src="./images/device icon/light.png" class="device-icon"
+											alt=""> </a>
+
+									</div>
+								</div>
+							</div>
+							<div class="col mb-4">
+								<div class="card zone">
+									<div class="card-header zone-card-header px-2"
+										style="background-image: url('./images/bg/z-bg-g.jpg');">
+										<h5 class="card-title text-white">Card title</h5>
+										<hr style="background-color: white; color: white; height: 1px;">
+									</div>
+									<div class="card-body devices"
+										style="background-color: rgb(153, 204, 153);">
+										<p class="card-text">This is a longer ceT a little bit
+											longer.</p>
+										<p class="card-text">
+											<small class="text-muted">Last updated 3 mins ago</small>
+										</p>
+									</div>
+								</div>
+							</div>
+							<div class="col mb-4">
+								<div class="card zone">
+									<div class="card-header zone-card-header px-2"
+										style="background-image: url('./images/bg/z-bg-b.jpg');">
+										<h5 class="card-title text-white">Card title</h5>
+										<hr style="background-color: white; color: white; height: 1px;">
+									</div>
+									<div class="card-body devices"
+										style="background-color: rgb(153, 153, 255);">
+										<p class="card-text">This is a longer ceT a little bit
+											longer.</p>
+										<p class="card-text">
+											<small class="text-muted">Last updated 3 mins ago</small>
+										</p>
+									</div>
+								</div>
+							</div>
+							<div class="col mb-4">
+								<div class="card zone">
+									<div class="card-header zone-card-header px-2"
+										style="background-image: url('./images/bg/z-bg-v.jpg');">
+										<h5 class="card-title text-white">Card title</h5>
+										<hr style="background-color: white; color: white; height: 1px;">
+									</div>
+									<div class="card-body devices"
+										style="background-color: rgb(153, 102, 204);">
+										<p class="card-text">This is a longer ceT a little bit
+											longer.</p>
+										<p class="card-text">
+											<small class="text-muted">Last updated 3 mins ago</small>
+										</p>
+									</div>
+								</div>
+							</div>
+							<div class="col mb-4">
+								<div class="card zone">
+									<div class="card-header zone-card-header px-2"
+										style="background-image: url('./images/bg/z-bg-y.jpg');">
+										<h5 class="card-title text-white">Card title</h5>
+										<hr style="background-color: white; color: white; height: 1px;">
+									</div>
+									<div class="card-body devices"
+										style="background-color: rgb(204, 204, 102);">
+										<p class="card-text">This is a longer ceT a little bit
+											longer.</p>
+										<p class="card-text">
+											<small class="text-muted">Last updated 3 mins ago</small>
+										</p>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div> -->
+				</div>
+
+				<div id="z-indicators" class="d-flex justify-content-center">
+					<span id="1" class="indicator z-indicator z-ind-active"></span> <span
+						id="2" class="indicator z-indicator"></span>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+
+<script src="./js/jquery.min.js"></script>
+<script src="./js/bootstrap.bundle.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+
+<script id="getData">
+	
+	updateData()
+	function updateData(){
+		
+		var vueL = new Vue({
+			el:'#content',
+			data:{
+				zones:getZones(),
+				locationsName:getLocationsName()
+			},
+			methods:{
+				changeLocation:function(e){
+					console.log(e.currentTarget.id)
+					var choiceOrigin = JSON.parse(window.localStorage.getItem('choice'))
+					var choiceTemp = {location:e.currentTarget.id.substring(8,9),zone:0,device:0}
+					window.localStorage.setItem('choice',JSON.stringify(choiceTemp))
+
+					if (getZones().length==0){
+						alert('No zones in this location!')
+						window.localStorage.setItem('choice',JSON.stringify(choiceOrigin))
+					}else{
+						$('.btn-loc.active').removeClass("active")
+						e.currentTarget.classList.add("active")
+						this.zones=getZones()
+					}
+					console.log(this)
+				}
+			}
+		})
+
+		console.log('vue l is ')
+		console.log(vueL)
+	
+
+		
+	}
+
+	//get locations' name
+	function getLocationsName(){
+		var primaryData = JSON.parse(window.localStorage.primaryData)
+		var choice = JSON.parse(window.localStorage.choice)
+		var locationsName =[]
+		for (var i = 0;i< primaryData.locations.length;i++){
+			if(i%4==0){
+				locationsName[Math.floor(i/4)]=[]
+			}
+			locationsName[Math.floor(i/4)][i%4]=primaryData.locations[i].name
+			
+		}
+		return locationsName
+	}
+
+	//get zone's infomation
+	function getZones(){
+		var primaryData = JSON.parse(window.localStorage.primaryData)
+		var choice = JSON.parse(window.localStorage.choice)
+		var deviceBg = JSON.parse(window.localStorage.deviceBg)
+		var deviceBgC = JSON.parse(window.localStorage.deviceBgC)
+		var zones = []
+		for (var i =0; i<primaryData.locations[choice.location].extenders.length;i++){
+			if(i%6==0){
+				zones[Math.floor(i/6)]=[]
+			}
+		
+			zones[Math.floor(i/6)][i%6]=primaryData.locations[choice.location].extenders[i]
+			zones[Math.floor(i/6)][i%6].deviceBg = deviceBg[i%6]
+			zones[Math.floor(i/6)][i%6].deviceBgC = deviceBgC[i%6]
+			
+		}
+		console.log('zones is ')
+		console.log(zones)
+
+		return zones
+	}
+		
+
+	//define the clicking function when choosing a location
+	// $('.btn-loc').click(function(e){
+	// 	$('.btn-loc.active').removeClass("active")
+	// 	this.classList.add("active")
+
+	// 	console.log(e.currentTarget.id)
+	// 	var choiceTemp = {location:e.currentTarget.id.substring(8,9),zone:0}
+	// 	window.localStorage.setItem('choice',JSON.stringify(choiceTemp))
+		
+	// })
+	
+</script>
+
+<script id="toggle indicators">
+	//transform the collection to array so that can get the index of the element easily.
+	var choice = JSON.parse(window.localStorage.getItem('choice'))
+
+	l1 = Math.floor(choice.location/4)
+	l2 = choice.location
+	z1 = Math.floor(choice.zone/6)
+
+	document.getElementById('location-item'+l1).classList.add("active")
+	document.getElementById('location'+l2).classList.add("active")
+	document.getElementById('zone-item'+z1).classList.add("active")
+
+	var locationIndicators = Array.from(document.getElementsByClassName("loc-indicator"))
+	console.log(locationIndicators.length)
+
+	for(var i=0;i<locationIndicators.length;i++){
+		locationIndicators[i].addEventListener("click",function(){
+			
+			$('#locations-carousel').carousel(locationIndicators.indexOf(this));
+			document.getElementsByClassName("loc-ind-active")[0].classList.remove("loc-ind-active")
+			this.classList.add("loc-ind-active")
+		})
+	}
+
+	var zoneIndicators = Array.from(document.getElementsByClassName("z-indicator"))
+	console.log(zoneIndicators.length)
+
+	for(var i=0;i<zoneIndicators.length;i++){
+		zoneIndicators[i].addEventListener("click",function(){
+			
+			$('#zones-carousel').carousel(zoneIndicators.indexOf(this));
+			document.getElementsByClassName("z-ind-active")[0].classList.remove("z-ind-active")
+			this.classList.add("z-ind-active")
+		})
+	}
+</script>
+
+
+
+<script id="selectLocation">
+	
+</script>
+<script id="gotoZone">
+	$('.zone').click(function(e){
+		console.log(e.currentTarget.id)
+		var choiceOrigin = JSON.parse(window.localStorage.getItem('choice'))
+		var choiceTemp = {location:choiceOrigin.location,zone:e.currentTarget.id.substring(4,5),device:0}
+		window.localStorage.setItem('choice',JSON.stringify(choiceTemp))
+		$("#content",window.parent.document).attr('src','zone.html')
+		
+	})
+</script>
+
+
+
+</html>

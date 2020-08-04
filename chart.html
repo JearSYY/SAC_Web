@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta>
+<meta>
+<title>chart.js test</title>
+<script src="js/Chart.bundle.min.js"></script>
+<script src="js/jquery.min.js"></script>
+</head>
+
+<body>
+	<canvas id="myChart"
+		style="background-color: white; width: 1920px; height: 850px;"></canvas>
+	<span>Select time range</span>
+	<button id="d1">1 day</button>
+	<button id="d7">7 days</button>
+	<button id="d10">10 days</button>
+	<button id="d30">30 days</button>
+	<br>
+	<button id="prev">previous</button>
+	<button id="next">Next</button>
+</body>
+
+<script>
+  //indicate the mode of the chart
+  var mode = 30
+  //indicate the current index of the data captured
+  var currentIndex = 0
+
+  var data_primary
+  var xLabel_primary= []
+  var xLabel =[]
+  var dayIndex = []
+  var ctx = document.getElementById('myChart').getContext('2d')
+  var config = {
+    type:'line',
+    data:{
+      datasets:[
+        {
+          label:'temperature',
+          data:'',
+          // type:'line',
+          pointStyle:'line',
+        }
+      ]
+    },
+    options:{
+      title:{
+        display:true,
+        text:'test'
+      },
+      legend: {
+        display: true,
+      },
+      scales: {
+        yAxes: [{
+          type: 'linear',
+          position:'left',
+          ticks:{
+            min:10,
+            max:40,
+            
+          }
+        }],
+        xAxes: [{
+          type: 'linear',
+          gridLines:{
+            display:false
+          },
+          ticks:{
+            min:0,
+            stepSize:240,
+            callback(v,i,t){
+              if(v==xLabel_primary.length){
+                return xLabel_primary[xLabel_primary.length-1]
+              }else{
+                return xLabel_primary[v]
+              }
+            }
+          }
+          
+        }], 
+      }
+    }
+  }
+  window.lineChart = new Chart(ctx,config)
+
+  //get data from server
+  var historyData
+  var xhttp = new XMLHttpRequest()
+  xhttp.open('GET','https://conexumhome.connectble.com/v6/location/location-xYr9OFRpnYRURWNWAShgvh2JGcVJN6bG/extender/extender-wxt200-000199040168/stateHistory',true)
+  xhttp.setRequestHeader("Content-type", "application/Json");
+  xhttp.setRequestHeader("Authorization", "MT5dct51Y4YAmEyPsq0pWSINciE9kWrK9YobLJ8Hk32kPyFQo9NgCqoWKDj7G75O");
+  xhttp.send()
+  xhttp.onreadystatechange = function() {
+    historyData = JSON.parse(xhttp.response).payload.data
+    //console.log(historyData)
+
+    data_primary = getData(historyData,'temperature')
+    xLabel=xLabel_primary
+    
+    config.data.datasets[0].data = data_primary
+    
+    window.lineChart.update()
+    
+  };
+
+  function getData(history,type){
+    var data =[]
+    var j = 0
+    for (var i=0;i<history.length;i++){
+      //console.log((history[i]))
+      data[i] = {}
+      data[i].y = (eval('history[i].'+type).toFixed(2))
+      data[i].x = i
+      xLabel_primary[i] = {}
+      xLabel_primary[i] = history[i].timestamp.substring(5,16).replace('T',' ')
+      if (history[i].timestamp.includes('00:00:00')){
+        dayIndex[j] = i
+        j++
+      }
+    }
+    console.log(dayIndex)
+    
+    //alert when something triggered
+    if (data[data.length-1].y>25){
+      alert("So hot!!! (>25'&#8451;')")
+    }
+    return data
+  }
+  
+  document.getElementById('d1').addEventListener('click', function() {
+    mode = 1
+    updateChart()
+  });
+  document.getElementById('d7').addEventListener('click', function() {
+    mode = 7
+    updateChart()
+  });
+  document.getElementById('d10').addEventListener('click', function() {
+    mode = 10
+    updateChart()
+  });
+
+  document.getElementById('d30').addEventListener('click', function() {
+    if(mode===30){
+      alert("Already the max level!!!")
+    }
+    else{
+      mode=30
+      updateChart()
+    }
+  });
+  document.getElementById('prev').addEventListener('click', function() {
+    if (currentIndex===0){
+      alert("No data before!")
+    }else{
+      currentIndex = currentIndex-1
+      updateChart()
+    }
+  });
+  document.getElementById('next').addEventListener('click', function() {
+    if (currentIndex===dayIndex.length){
+      alert("No data after!")
+    }else{
+      currentIndex = currentIndex+1
+      updateChart()
+    }
+  });
+
+  function updateChart(){
+    
+    var interval = mode
+    var min = dayIndex[currentIndex]
+    var max = dayIndex[currentIndex+interval]
+    var dataTemp = data_primary.slice(min,max)
+    xLabel = xLabel_primary.slice(min,max)
+    config.data.datasets[0].data = dataTemp
+    config.options.scales.xAxes[0].ticks.min=min
+    config.options.scales.xAxes[0].ticks.max=max
+    config.options.scales.xAxes[0].ticks.stepSize = mode==1?6:(mode==30?240:(max-min)/mode)
+    
+    console.log('rang is '+min+' to '+max)
+    console.log(dataTemp)
+    console.log(xLabel)
+    console.log("xlabel_primary")
+    console.log(xLabel_primary)
+
+    window.lineChart.update();
+    
+  }
+
+</script>
+
+
+
+
+<!-- <script>
+  $(function(){
+    $.ajax({
+      url:'https://conexumhome.connectble.com/v6/location/location-xYr9OFRpnYRURWNWAShgvh2JGcVJN6bG/extender/extender-wxt200-000199040168/stateHistory',
+      type:"GET",
+      headers:{
+        "Content-Type":"application/Json",
+        //official version
+        //"Authorization":wx.getStorageSync('token'),
+        //test version
+        "Authorization":"MT5dct51Y4YAmEyPsq0pWSINciE9kWrK9YobLJ8Hk32kPyFQo9NgCqoWKDj7G75O",
+      },
+      timeout:15000,
+      dataType:'json',
+      success:function(res){
+        console.log(res.data)
+      },
+    })
+  })
+</script> -->
+
+
+</html>
