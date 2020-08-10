@@ -177,6 +177,9 @@ body {
 						</div>
 					</div>
 				</div>
+				<div id="data" class="btn btn-primary" style="width:200px;">
+					History Data
+				</div>
 			</div>
 
 			<div id="z-control-panel"
@@ -194,7 +197,11 @@ body {
 						alt="">
 				</div>
 			</div>
+
+			
+
 		</div>
+
 
 		<div class="content d-flex">
 			<div class="zone-card card">
@@ -531,11 +538,12 @@ body {
 
 </script>
 
-<!-- <script id="changeLocation">
-	$('.btn-loc').click(function(){
-		$('#content',window.parent.document).attr('src','location.html')
+<script id="historyData">
+	$('#data').click(function(e){
+		$("#content",window.parent.document).attr('src','chart.html')
 	})
-</script> -->
+
+</script>
 
 <script>
 	

@@ -23,10 +23,11 @@
 
 <script>
   //indicate the mode of the chart
-  var mode = 30
+  var mode
   //indicate the current index of the data captured
   var currentIndex = 0
-
+  //indicate the range of returned data
+  var range
   var data_primary
   var xLabel_primary= []
   var xLabel =[]
@@ -47,7 +48,7 @@
     options:{
       title:{
         display:true,
-        text:'test'
+        text:'History Data'
       },
       legend: {
         display: true,
@@ -69,12 +70,21 @@
           },
           ticks:{
             min:0,
-            stepSize:240,
+            stepSize:'',
             callback(v,i,t){
-              if(v==xLabel_primary.length){
-                return xLabel_primary[xLabel_primary.length-1]
+              // if(v>=xLabel_primary.length){
+              var val = Math.ceil(v)
+              if(val >=xLabel_primary.length-1){
+                // console.log(xLabel_primary.length-1)
+                // console.log(xLabel_primary[xLabel_primary.length-1])
+                // return xLabel_primary[xLabel_primary.length-1]
+                console.log('end')
+                return ' '
               }else{
-                return xLabel_primary[v]
+                console.log('not end')
+                console.log(val)
+                console.log(xLabel_primary[val])
+                return xLabel_primary[val]
               }
             }
           }
@@ -87,20 +97,30 @@
 
   //get data from server
   var historyData
+  var choice = JSON.parse(localStorage.getItem('choice'))
+  var primaryData = JSON.parse(window.localStorage.getItem('primaryData'))
+ 
+
+  var locationId = primaryData.locations[choice.location].id
+  var extenderId = primaryData.locations[choice.location].extenders[choice.zone].id
+
+
   var xhttp = new XMLHttpRequest()
-  xhttp.open('GET','https://conexumhome.connectble.com/v6/location/location-xYr9OFRpnYRURWNWAShgvh2JGcVJN6bG/extender/extender-wxt200-000199040168/stateHistory',true)
+  xhttp.open('GET','https://conexumhome.connectble.com/v6/location/'+locationId+'/extender/'+extenderId+'/stateHistory',true)
+  // xhttp.open('GET','https://conexumhome.connectble.com/v6/location/location-bccbkImXrLMsV3uncKC6W6CthjoutJsC/extender/extender-wxt200-000199031283/stateHistory',true)
   xhttp.setRequestHeader("Content-type", "application/Json");
   xhttp.setRequestHeader("Authorization", "MT5dct51Y4YAmEyPsq0pWSINciE9kWrK9YobLJ8Hk32kPyFQo9NgCqoWKDj7G75O");
   xhttp.send()
   xhttp.onreadystatechange = function() {
     historyData = JSON.parse(xhttp.response).payload.data
-    //console.log(historyData)
+    console.log(historyData)
 
     data_primary = getData(historyData,'temperature')
     xLabel=xLabel_primary
     
     config.data.datasets[0].data = data_primary
-    
+    config.options.scales.xAxes[0].ticks.stepSize = Math.ceil(historyData.length/range)
+
     window.lineChart.update()
     
   };
@@ -119,13 +139,23 @@
         dayIndex[j] = i
         j++
       }
+      
     }
     console.log(dayIndex)
+
+    var start = history[0].timestamp.substring(0,10)
+    var end = history[history.length-1].timestamp.substring(0,10)
+    range = Math.ceil((new Date(end)-new Date(start))/3600/24/1000)+1
+    mode = range
+    console.log('range is '+range)
     
     //alert when something triggered
     if (data[data.length-1].y>25){
       alert("So hot!!! (>25'&#8451;')")
     }
+    // console.log('data')
+    // console.log(data)
+
     return data
   }
   
@@ -160,7 +190,7 @@
     }
   });
   document.getElementById('next').addEventListener('click', function() {
-    if (currentIndex===dayIndex.length){
+    if (currentIndex>=(dayIndex.length-mode)){
       alert("No data after!")
     }else{
       currentIndex = currentIndex+1
@@ -171,22 +201,36 @@
   function updateChart(){
     
     var interval = mode
-    var min = dayIndex[currentIndex]
-    var max = dayIndex[currentIndex+interval]
-    var dataTemp = data_primary.slice(min,max)
-    xLabel = xLabel_primary.slice(min,max)
-    config.data.datasets[0].data = dataTemp
-    config.options.scales.xAxes[0].ticks.min=min
-    config.options.scales.xAxes[0].ticks.max=max
-    config.options.scales.xAxes[0].ticks.stepSize = mode==1?6:(mode==30?240:(max-min)/mode)
-    
-    console.log('rang is '+min+' to '+max)
-    console.log(dataTemp)
-    console.log(xLabel)
-    console.log("xlabel_primary")
-    console.log(xLabel_primary)
+    if(interval>range){
+      alert('data not enough')
+    }else{
+      var min = dayIndex[currentIndex]
+      var t = (currentIndex+interval)>=dayIndex.length?dayIndex.length:currentIndex+interval
+      var max = (currentIndex+interval)>=dayIndex.length?data_primary.length-1:dayIndex[currentIndex+interval]
+      var dataTemp = data_primary.slice(min,max)
+      // xLabel = xLabel_primary.slice(min,max)
+      
+      config.data.datasets[0].data = dataTemp
+      config.options.scales.xAxes[0].ticks.min=min
+      config.options.scales.xAxes[0].ticks.max=max
+      config.options.scales.xAxes[0].ticks.stepSize = mode==1?(max-min)/6:(mode==30?240:(max-min)/mode)
+      // config.options.scales.xAxes[0].ticks.stepSize = currentIndex==0?272/7:30
+      
+      console.log('data is ')
+      console.log(config.data.datasets[0].data)
+      console.log('t is ')
+      console.log(t)
+      console.log('min is ')
+      console.log(config.options.scales.xAxes[0].ticks.min)
+      console.log('max is ')
+      console.log(config.options.scales.xAxes[0].ticks.max)
+      console.log('stepsize is '+config.options.scales.xAxes[0].ticks.stepSize)
+      console.log(mode)
+      console.log(currentIndex)
+      console.log(xLabel_primary)
 
-    window.lineChart.update();
+      window.lineChart.update();
+    }
     
   }
 
