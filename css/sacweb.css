@@ -5,10 +5,12 @@
  */
 html {
 	height: 100%;
+	width: 100%
 }
 
 body {
 	height: 100%;
+	width: 100%
 }
 
 .sidebar-icon {
@@ -90,4 +92,20 @@ button:hover {
 .input-text:focus {
 	border: none;
 	outline: none;
+}
+
+.btn-mode {
+	color: #6c757d;
+	border-radius: 0;
+	border: 1px solid #6c757d;
+	border-left: 0;
+}
+
+.btn-mode:first-child {
+	border-left: 1px solid #6c757d;
+}
+
+.btn-mode.active {
+	color: white;
+	background-color: #6c757d;
 }

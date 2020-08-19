@@ -15,6 +15,7 @@
 [v-cloak] {
 	display: none !important;
 }
+
 body {
 	min-width: 1793px;
 	min-height: 920px;
@@ -132,8 +133,6 @@ body {
 	font-weight: bold;
 	z-index: 2;
 }
-
-
 </style>
 
 </head>
@@ -177,9 +176,8 @@ body {
 						</div>
 					</div>
 				</div>
-				<div id="data" class="btn btn-primary" style="width:200px;">
-					History Data
-				</div>
+				<div id="data" class="btn btn-primary" style="width: 200px;">
+					History Data</div>
 			</div>
 
 			<div id="z-control-panel"
@@ -198,17 +196,18 @@ body {
 				</div>
 			</div>
 
-			
+
 
 		</div>
 
 
 		<div class="content d-flex">
+			
 			<div class="zone-card card">
 				<div class="card-header zone-card-header px-2"
 					style="background-image: url('./images/bg/z-bg-g.jpg');">
 					<h2 class="card-title zone-name" v-cloak>{{zones[Math.floor(choice.zone/6)][Math.floor(choice.zone%6)].zones[0].name}}</h2>
-					
+
 					<!-- <h2 class="card-title zone-name">123</h2> -->
 
 					<div class="temp&humd align-self-end">
@@ -280,10 +279,11 @@ body {
 
 				<div id="dev-carousel-inner" class="carousel-inner h-100">
 
-					<div class="dev-carousel-item carousel-item h-100"
-						v-for="(item,i) in numOfDevs" :id="'dev-item'+i">
-						<iframe src="device.html" frameborder="0" class="dev-frame"
-							:id='i'></iframe>
+					<div class="dev-carousel-item carousel-item h-100" v-for="(item,i) in numOfDevs" :id="'dev-item'+i">
+
+						
+
+						<iframe src="device.html" frameborder="0" class="dev-frame" :id='"dev-frame"+i'></iframe>
 					</div>
 
 					<!-- <div class="dev-carousel-item carousel-item h-100 active">
@@ -350,27 +350,31 @@ body {
 						window.localStorage.setItem('choice',JSON.stringify(choiceOrigin))
 					}else{
 
-						//set the active status of buttons
-						$('.btn-loc.active').removeClass("active")
-						$('.btn-z.active').removeClass("active")
-						$('#zone0').addClass('active')
+						// //set the active status of buttons
+						// $('.btn-loc.active').removeClass("active")
+						// $('.btn-z.active').removeClass("active")
+						// $('#zone0').addClass('active')
 
-						e.currentTarget.classList.add("active")
-						this.zones=getZones()
+						// e.currentTarget.classList.add("active")
 						this.choice = choiceTemp
+						this.zones=getZones()
+						
 
 						if (devLength().length==0){
 							alert('No devices in this zone!')
 							window.localStorage.setItem('choice',JSON.stringify(choiceOrigin))
 						}
 						this.numOfDevs=devLength()
+
+
 						for (i in this.numOfDevs){
-							$('#'+i).contents().find('#zoneController').click()
+							$('#dev-frame'+i).contents().find('#zoneController').click()
 						}
 					}
+
+					updateActive()
 				},
 				changeZone:function(e){
-					// $('#content',window.parent.document).attr('src','location.html')
 					console.log(e.currentTarget.id)
 					var choiceOrigin = JSON.parse(window.localStorage.getItem('choice'))
 					var choiceTemp = {location:choiceOrigin.location,zone:e.currentTarget.id.substring(4,5),device:0}
@@ -382,13 +386,19 @@ body {
 						window.localStorage.setItem('choice',JSON.stringify(choiceOrigin))
 					}else{
 						this.choice=choiceTemp
-						$('.btn-z.active').removeClass("active")
-						e.currentTarget.classList.add("active")
+						// $('.btn-z.active').removeClass("active")
+						// e.currentTarget.classList.add("active")
 						this.numOfDevs=devLength()
-						for (i in this.numOfDevs){
-							$('#'+i).contents().find('#zoneController').click()
-						}
+
 						
+
+						for (i in this.numOfDevs){
+							console.log(i+' times')
+							$('#dev-frame'+i).contents().find('#zoneController').click()
+							
+						}
+					
+						updateActive()
 					}
 				}
 			}
@@ -455,6 +465,8 @@ body {
 		
 	// }
 
+
+	//get the index of dev-items
 	function devLength(){
 		var primaryData = JSON.parse(window.localStorage.primaryData)
 		var choice = JSON.parse(window.localStorage.choice)
@@ -469,22 +481,31 @@ body {
 	
 </script>
 
+<script id="updateACtive">
+	updateActive()
+	function updateActive(){
+		var choice = JSON.parse(window.localStorage.getItem('choice'))
+
+		l1 = Math.floor(choice.location/4)
+		l2 = choice.location
+		z1 = Math.floor(choice.zone/6)
+		z2 = choice.zone
+		console.log('z1 '+z1+' z2'+z2)
+
+		$('.btn-loc.active').removeClass('active')
+		$('.btn-z').removeClass('active')
+
+		document.getElementById('location-item'+l1).classList.add("active")
+		document.getElementById('location'+l2).classList.add("active")
+		document.getElementById('zone-item'+z1).classList.add("active")
+		document.getElementById('zone'+z2).classList.add("active")
+		document.getElementById('dev-item0').classList.add("active")
+	}
+</script>
+
 
 <script id="loc-controls">
 	//transform the collection to array so that can get the index of the element easily.
-	var choice = JSON.parse(window.localStorage.getItem('choice'))
-
-	l1 = Math.floor(choice.location/4)
-	l2 = choice.location
-	z1 = Math.floor(choice.zone/4)
-	z2 = choice.zone%4
-	console.log(l2+' '+z2)
-
-	document.getElementById('location-item'+l1).classList.add("active")
-	document.getElementById('location'+l2).classList.add("active")
-	document.getElementById('zone-item'+z1).classList.add("active")
-	document.getElementById('zone'+z2).classList.add("active")
-	document.getElementById('dev-item0').classList.add("active")
 
 	$('#loc-control-prev').click(function(){
 		$('#locations-carousel').carousel('prev');
@@ -549,7 +570,7 @@ body {
 	
 	var childFrame = document.getElementsByClassName('dev-frame')
 	for (var i=0;i<childFrame.length;i++){
-		childFrame[i].contentWindow.parameter = childFrame[i].id
+		childFrame[i].contentWindow.parameter = childFrame[i].id.substring(9,10)
 	}
 	console.log(childFrame)
 

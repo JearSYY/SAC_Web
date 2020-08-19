@@ -1,24 +1,48 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta>
-<meta>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="./css/bootstrap.css">
+<link rel="stylesheet" href="./css/sacweb.css">
 <title>chart.js test</title>
 <script src="js/Chart.bundle.min.js"></script>
 <script src="js/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
 </head>
 
 <body>
-	<canvas id="myChart"
-		style="background-color: white; width: 1920px; height: 850px;"></canvas>
-	<span>Select time range</span>
-	<button id="d1">1 day</button>
-	<button id="d7">7 days</button>
-	<button id="d10">10 days</button>
-	<button id="d30">30 days</button>
-	<br>
-	<button id="prev">previous</button>
-	<button id="next">Next</button>
+  <div id="content" class="d-flex justify-content-center align-items-center pt-5">
+    <h2><span class="badge badge-pill badge-primary mr-3" >Location</span></h2>
+    
+    <h3 style="color:#6c757d;">{{location}}</h3>
+    <h2><span class="badge badge-pill badge-info mx-3">Zone</span></h2>
+    <h3 style="color:#6c757d;">{{zone}}</h3>  
+    <div class="spinner-border text-primary" style="width: 50px;height:50px;position:absolute;top:500px;left:49%;" v-if="!loaded"></div>
+  </div>
+
+  <div class="btn-group mx-auto d-flex" style="margin-bottom:50px;margin-top:30px;width:50%">
+    <label class="btn btn-mode active" style="border-radius: 10px 0 0 10px;" id="d1">Last 1 day</label>
+    <label class="btn btn-mode" id="d7">7 days</label>
+    <label class="btn btn-mode" id="d10">10 days</label>
+    <label class="btn btn-mode" style="border-radius: 0 10px 10px 0;" id="d30">30 days</label>
+  </div>
+  <div style="width:70%; height:60%;" class="mx-auto">
+    <canvas id="myChart" style="height:100%;"></canvas>
+    <div class="btn-group mx-auto d-flex" style="margin-top:30px;width:25%">
+      <label class="btn btn-mode" style="border-radius: 10px 0 0 10px;" id="prev">Prev</label>
+      <label class="btn btn-mode" id="next" style="border-radius: 0 10px 10px 0;">Next</label>
+    </div>
+  </div>
+  
+
+
+  <!-- <div class="btn-group mx-auto" style="margin-top:30px;width:25%">
+    <label class="btn btn-mode" style="border-radius: 10px 0 0 10px;" id="prev">Prev</label>
+    <label class="btn btn-mode" id="next" style="border-radius: 0 10px 10px 0;">Next</label>
+  </div> -->
+  
 </body>
 
 <script>
@@ -38,7 +62,7 @@
     data:{
       datasets:[
         {
-          label:'temperature',
+          label:'Temperature',
           data:'',
           // type:'line',
           pointStyle:'line',
@@ -47,11 +71,13 @@
     },
     options:{
       title:{
-        display:true,
-        text:'History Data'
+        display:false,
       },
       legend: {
         display: true,
+        labels:{
+          fontSize:20,
+        }
       },
       scales: {
         yAxes: [{
@@ -60,6 +86,7 @@
           ticks:{
             min:10,
             max:40,
+            fontSize:15,
             
           }
         }],
@@ -71,6 +98,7 @@
           ticks:{
             min:0,
             stepSize:'',
+            fontSize:15,
             callback(v,i,t){
               // if(v>=xLabel_primary.length){
               var val = Math.ceil(v)
@@ -83,7 +111,7 @@
               }else{
                 console.log('not end')
                 console.log(val)
-                console.log(xLabel_primary[val])
+                
                 return xLabel_primary[val]
               }
             }
@@ -105,6 +133,16 @@
   var extenderId = primaryData.locations[choice.location].extenders[choice.zone].id
 
 
+  var vue = new Vue({
+    el:'#content',
+    data:{
+      location: primaryData.locations[choice.location].name,
+      zone: primaryData.locations[choice.location].extenders[choice.zone].zones[0].name,
+      loaded: false
+    }
+  })
+
+
   var xhttp = new XMLHttpRequest()
   xhttp.open('GET','https://conexumhome.connectble.com/v6/location/'+locationId+'/extender/'+extenderId+'/stateHistory',true)
   // xhttp.open('GET','https://conexumhome.connectble.com/v6/location/location-bccbkImXrLMsV3uncKC6W6CthjoutJsC/extender/extender-wxt200-000199031283/stateHistory',true)
@@ -112,16 +150,26 @@
   xhttp.setRequestHeader("Authorization", "MT5dct51Y4YAmEyPsq0pWSINciE9kWrK9YobLJ8Hk32kPyFQo9NgCqoWKDj7G75O");
   xhttp.send()
   xhttp.onreadystatechange = function() {
-    historyData = JSON.parse(xhttp.response).payload.data
-    console.log(historyData)
 
-    data_primary = getData(historyData,'temperature')
-    xLabel=xLabel_primary
-    
-    config.data.datasets[0].data = data_primary
-    config.options.scales.xAxes[0].ticks.stepSize = Math.ceil(historyData.length/range)
+    vue.loaded = true
 
-    window.lineChart.update()
+    var response = JSON.parse(xhttp.response)
+    if(response.message!="Done"){
+      alert(response.message+"!!!")
+    }else if(response.payload.data.length == 0){
+      alert('no data of this extender')
+    }else{
+      historyData = response.payload.data
+      console.log(historyData)
+
+      data_primary = getData(historyData,'temperature')
+      xLabel=xLabel_primary
+      
+      config.data.datasets[0].data = data_primary
+      config.options.scales.xAxes[0].ticks.stepSize = Math.ceil(historyData.length/range)
+
+      window.lineChart.update()
+    }
     
   };
 
@@ -160,28 +208,59 @@
   }
   
   document.getElementById('d1').addEventListener('click', function() {
-    mode = 1
-    updateChart()
+    if(1>range){
+      alert('data not enough')
+      
+    }else{
+      $('.btn-mode.active').removeClass('active')
+      this.classList.add('active')
+      mode = 1
+      updateChart()
+    }
   });
   document.getElementById('d7').addEventListener('click', function() {
-    mode = 7
-    updateChart()
+    
+    if(7>range){
+      alert('data not enough')
+      
+    }else{
+      $('.btn-mode.active').removeClass('active')
+      this.classList.add('active')
+      mode = 7
+      updateChart()
+    }
   });
   document.getElementById('d10').addEventListener('click', function() {
-    mode = 10
-    updateChart()
+    
+    if(10>range){
+      alert('data not enough')
+      
+    }else{
+      $('.btn-mode.active').removeClass('active')
+      this.classList.add('active')
+     
+      updateChart()
+    }
   });
 
   document.getElementById('d30').addEventListener('click', function() {
-    if(mode===30){
+
+    if(30>range){
+      alert('data not enough')
+      
+    }else if(mode===30){
       alert("Already the max level!!!")
-    }
-    else{
+    }else{
+      $('.btn-mode.active').removeClass('active')
+      this.classList.add('active')
       mode=30
       updateChart()
     }
   });
+
+
   document.getElementById('prev').addEventListener('click', function() {
+
     if (currentIndex===0){
       alert("No data before!")
     }else{
@@ -201,64 +280,40 @@
   function updateChart(){
     
     var interval = mode
-    if(interval>range){
-      alert('data not enough')
-    }else{
-      var min = dayIndex[currentIndex]
-      var t = (currentIndex+interval)>=dayIndex.length?dayIndex.length:currentIndex+interval
-      var max = (currentIndex+interval)>=dayIndex.length?data_primary.length-1:dayIndex[currentIndex+interval]
-      var dataTemp = data_primary.slice(min,max)
-      // xLabel = xLabel_primary.slice(min,max)
-      
-      config.data.datasets[0].data = dataTemp
-      config.options.scales.xAxes[0].ticks.min=min
-      config.options.scales.xAxes[0].ticks.max=max
-      config.options.scales.xAxes[0].ticks.stepSize = mode==1?(max-min)/6:(mode==30?240:(max-min)/mode)
-      // config.options.scales.xAxes[0].ticks.stepSize = currentIndex==0?272/7:30
-      
-      console.log('data is ')
-      console.log(config.data.datasets[0].data)
-      console.log('t is ')
-      console.log(t)
-      console.log('min is ')
-      console.log(config.options.scales.xAxes[0].ticks.min)
-      console.log('max is ')
-      console.log(config.options.scales.xAxes[0].ticks.max)
-      console.log('stepsize is '+config.options.scales.xAxes[0].ticks.stepSize)
-      console.log(mode)
-      console.log(currentIndex)
-      console.log(xLabel_primary)
+    var min = dayIndex[currentIndex]
+    var t = (currentIndex+interval)>=dayIndex.length?dayIndex.length:currentIndex+interval
+    var max = (currentIndex+interval)>=dayIndex.length?data_primary.length-1:dayIndex[currentIndex+interval]
+    var dataTemp = data_primary.slice(min,max)
+    // xLabel = xLabel_primary.slice(min,max)
+    
+    config.data.datasets[0].data = dataTemp
+    config.options.scales.xAxes[0].ticks.min=min
+    config.options.scales.xAxes[0].ticks.max=max
+    config.options.scales.xAxes[0].ticks.stepSize = mode==1?(max-min)/6:(mode==30?240:(max-min)/mode)
+    // config.options.scales.xAxes[0].ticks.stepSize = currentIndex==0?272/7:30
+    
+    console.log('data is ')
+    console.log(config.data.datasets[0].data)
+    console.log('t is ')
+    console.log(t)
+    console.log('min is ')
+    console.log(config.options.scales.xAxes[0].ticks.min)
+    console.log('max is ')
+    console.log(config.options.scales.xAxes[0].ticks.max)
+    console.log('stepsize is '+config.options.scales.xAxes[0].ticks.stepSize)
+    console.log(mode)
+    console.log(currentIndex)
+    console.log(xLabel_primary)
 
-      window.lineChart.update();
-    }
+    window.lineChart.update();
+    
     
   }
 
 </script>
 
-
-
-
-<!-- <script>
-  $(function(){
-    $.ajax({
-      url:'https://conexumhome.connectble.com/v6/location/location-xYr9OFRpnYRURWNWAShgvh2JGcVJN6bG/extender/extender-wxt200-000199040168/stateHistory',
-      type:"GET",
-      headers:{
-        "Content-Type":"application/Json",
-        //official version
-        //"Authorization":wx.getStorageSync('token'),
-        //test version
-        "Authorization":"MT5dct51Y4YAmEyPsq0pWSINciE9kWrK9YobLJ8Hk32kPyFQo9NgCqoWKDj7G75O",
-      },
-      timeout:15000,
-      dataType:'json',
-      success:function(res){
-        console.log(res.data)
-      },
-    })
-  })
-</script> -->
-
+<script>
+  
+</script>
 
 </html>

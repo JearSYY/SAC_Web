@@ -82,8 +82,11 @@ header {
 </head>
 <body>
 	<div id="content">
+		<div style="background-color: rgb(153, 204, 153);width:100%;height:25%;position:absolute;top: 0;z-index:-1;"></div>
 		<div id="zoneController" @click="changeZone" style="display: none;"></div>
 		<div class="device-card card" v-for="(item,i) in devices">
+			
+
 			<div class="card-header device-card-header"
 				style="background-color: rgb(153, 204, 153);">
 				<img src="./images/device icon/fan.png" class="dev-icon" alt="">
@@ -97,15 +100,15 @@ header {
 				</div>
 				<div id="cmd-carousel" class="carousel ml-3 mt-4"
 					data-interval="false">
-					<div id="cmd-carousel-inner" class="carousel-inner pt-3">
-						<div class="cmd-carousel-item carousel-item active">
+					<div id="cmd-carousel-inner" class="cmd-carousel-inner pt-3">
+						<!-- <div class="cmd-carousel-item carousel-item active">
 
 							<div class="command">
 								<div class="command-icon-wrapper">
 									<img src="./images/command icon/p on.png" class="command-icon"
 										alt="">
 								</div>
-								<span class="command-text"> Power on </span>
+								<span class="command-text">Power on </span>
 							</div>
 
 							<div class="command">
@@ -160,25 +163,25 @@ header {
 								<span class="command-text"> Power off </span>
 							</div>
 
-						</div>
+						</div> -->
 
-						<div class="cmd-carousel-item carousel-item">
+						<div class='cmd-carousel-item carousel-item' v-for="(cmd1,i1) in keys[i]">
 
-							<div class="command">
+							<div class="command" v-for="(cmd2,i2) in cmd1">
 								<div class="command-icon-wrapper">
 									<img src="./images/command icon/p off.png" class="command-icon"
-										alt="">
+										alt="" @click="sendCommand(i1,i2,i)">
 								</div>
-								<span class="command-text"> Power 3 </span>
+								<span class="command-text" v-cloak @click="sendCommand(i1,i2,i)">{{cmd2.keyName}}</span>
 							</div>
 
-							<div class="command">
+							<!-- <div class="command">
 								<div class="command-icon-wrapper">
 									<img src="./images/command icon/p off.png" class="command-icon"
 										alt="">
 								</div>
 								<span class="command-text"> Power off </span>
-							</div>
+							</div> -->
 
 						</div>
 
@@ -203,30 +206,187 @@ header {
 <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
 
 <script id="getData">
-	
 
+	var ks = []
+	var vueD
 
 	updateData()
 	function updateData(){
 		
-		var vueD = new Vue({
+		vueD = new Vue({
 			el:'#content',
 			data:{
 				devices:getDevices(),
-				choice:JSON.parse(window.localStorage.getItem('choice'))
+				choice:JSON.parse(window.localStorage.getItem('choice')),
+				keys:'',
+				acStatus:{
+					stPower:"",stMode:"",stTemp:"",stFan:"",stSwing:"",stTemp:""
+				}
+				// keys:getKeys()
 			},
 			methods:{
 				changeZone(){
+					console.log('parameter')
+					console.log(window.parameter)
 					this.devices=getDevices()
+					getKeys()
+					//console.log(this)
+					
+				},
+				sendCommand(i1,i2,devIndex){
+
+					//change the choice of device
+					this.choice.device = devIndex
+					var choiceTemp = JSON.parse(window.localStorage.getItem('choice'))
+					choiceTemp.device = devIndex
+					window.localStorage.setItem('choice',(JSON.stringify(choiceTemp)))
+
+					console.log(i1+" "+i2)
+
+					var targetDev = this.devices[this.choice.device]
+					var keyid = this.keys[this.choice.device][i1][i2].keyId
+					console.log('keyid')
+					console.log(keyid)
+
+					//check whether this device is AC or AV
+					if(JSON.parse(window.localStorage.getItem('deviceType')).AV.includes(targetDev.deviceTypeId)){
+						var xhttp = new XMLHttpRequest()
+						var data = {
+							keyId: keyid,
+							sync:1
+						}
+						
+						xhttp.open('POST','https://conexumhome.connectble.com/v6/location/'+JSON.parse(window.localStorage.getItem('primaryData')).locations[this.choice.location].id+'/extender/'
+												+targetDev.extenderId+'/zone/'+targetDev.zoneId+'/device/'+targetDev.id+'/irKey',true)
+						xhttp.setRequestHeader("Content-type", "application/Json");
+						xhttp.setRequestHeader("Authorization", "MT5dct51Y4YAmEyPsq0pWSINciE9kWrK9YobLJ8Hk32kPyFQo9NgCqoWKDj7G75O");
+						xhttp.send(JSON.stringify(data))
+
+						xhttp.onreadystatechange = function() {
+							console.log(xhttp.response)
+						}
+					}else{
+						var targetStatus = ""
+						var xhttp = new XMLHttpRequest()
+						
+						xhttp.open('GET','https://conexumhome.connectble.com/v6/location/'+JSON.parse(window.localStorage.getItem('primaryData')).locations[this.choice.location].id+'/extender/'
+												+targetDev.extenderId+'/zone/'+targetDev.zoneId+'/device/'+targetDev.id+'/irKey',true)
+						xhttp.setRequestHeader("Content-type", "application/Json");
+						xhttp.setRequestHeader("Authorization", "MT5dct51Y4YAmEyPsq0pWSINciE9kWrK9YobLJ8Hk32kPyFQo9NgCqoWKDj7G75O");
+						xhttp.send()
+
+						xhttp.onreadystatechange = function() {
+
+							//console.log(xhttp.response)
+							var statusList = JSON.parse(xhttp.response).payload.data
+
+							if(keyid=="1"){
+								targetStatus = {
+									keyId:"1",
+									stPower:"ON",
+									stMode:"COOL",
+									stTemp:"25",
+									stFan:"FAN AUTO",
+									stSwing:"ON"
+								}
+							}else{
+								var currentStatus = this.acStatus
+								
+								for (var i=0;i<statusList.length;i++){
+									if(keyid==statusList[i].keyId){
+										console.log("found keyid in statuslist")
+										switch(keyid){
+											case "1":
+												break;
+											case "3":break;
+											case "2":
+											case "4":
+											case "5":
+											case "7":  
+												for (var j=i;j<statusList.length;j++){
+												
+													if(currentStatus.stSwing==statusList[j].stSwing){
+														console.log("found status in statuslist")
+														targetStatus = statusList[j]
+													}else if(keyid!=statusList[j].keyId){break;}
+												}
+												break;
+											case "8":
+											case "9":
+											case "10":
+											case "11":
+												for (var j=i;j<statusList.length;j++){
+													if(currentStatus.stSwing==statusList[j].stSwing && currentStatus.stMode==statusList[j].stMode && currentStatus.stTemp==statusList[j].stTemp){
+														console.log("found status in statuslist")
+														targetStatus = statusList[j]
+													}else if(keyid!=statusList[j].keyId){break;}
+												}
+												break;
+											case "12":break;
+											case "13":
+												for (var j=i;j<statusList.length;j++){
+													if(currentStatus.stSwing==statusList[j].stSwing && currentStatus.stMode==statusList[j].stMode &&
+														(parseInt(currentStatus.stTemp)+1).toString()==statusList[j].stTemp){
+														console.log("found status in statuslist")
+														targetStatus = statusList[j]
+													}else if(keyid!=statusList[j].keyId){break;}
+												}
+												break;
+											case "14":
+												for (var j=i;j<statusList.length;j++){
+													if(currentStatus.stSwing==statusList[j].stSwing && currentStatus.stMode==statusList[j].stMode &&
+														(parseInt(currentStatus.stTemp)-1).toString()==statusList[j].stTemp){
+														console.log("found status in statuslist")
+														targetStatus = statusList[j]
+													}else if(keyid!=statusList[j].keyId){break;}
+												}
+												break;
+											case "39":break;
+											case "40":break;
+										}
+										break;
+									}
+								}
+							}
+
+							var xhttp2 = new XMLHttpRequest()
+
+							console.log('targetstatus')
+							console.log(targetStatus)
+							var data = {
+								keyId:targetStatus.keyId,
+								stPower:targetStatus.stPower,
+								stMode:targetStatus.stMode,
+								stTemp:targetStatus.stTemp,
+								stFan:targetStatus.stFan,
+								stSwing:targetStatus.stSwing,
+								sync: 1
+							}
+
+							xhttp2.open('POST','https://conexumhome.connectble.com/v6/location/'+JSON.parse(window.localStorage.getItem('primaryData')).locations[vueD.choice.location].id+'/extender/'
+												+targetDev.extenderId+'/zone/'+targetDev.zoneId+'/device/'+targetDev.id+'/irKey',true)
+							xhttp2.setRequestHeader("Content-type", "application/Json");
+							xhttp2.setRequestHeader("Authorization", "MT5dct51Y4YAmEyPsq0pWSINciE9kWrK9YobLJ8Hk32kPyFQo9NgCqoWKDj7G75O");
+							xhttp2.send(JSON.stringify(data))
+
+							xhttp2.onreadystatechange = function() {
+								//console.log(xhttp.response)
+							}
+						}
+
+					}
+
 				}
 			}
 		})
+		getKeys()
+		
 
-		console.log('vue d is ')
-		console.log(vueD)
 	}
+
 	function getDevices(){
 		var devIndex = parseInt(window.parameter)
+		
 		var devices =[]
 		var choice = JSON.parse(window.localStorage.choice)
 		var primaryDev = JSON.parse(window.localStorage.primaryData).locations[choice.location].extenders[choice.zone].zones[0].devices
@@ -246,8 +406,189 @@ header {
 	}
 
 
+	function getKeys(){
+		var index = 0
+		var choice = JSON.parse(window.localStorage.choice)
+		var primaryDev = JSON.parse(window.localStorage.primaryData).locations[choice.location].extenders[choice.zone].zones[0].devices
+		ks = []
+		sendKeyRequest(index,primaryDev)
+		// console.log("ks")
+		// console.log(ks)
+		// console.log(ks[0])
+		// return ks
+	}
+
+	// function sendKeyRequest(i,primaryDev){
+	// 	// console.log('primaryDev')
+	// 	// console.log(primaryDev)
+
+	// 	console.log(i)
+
+	// 	var data ={
+	// 		function_id:7,
+	// 		region:primaryDev[i].region,
+	// 		deviceId:primaryDev[i].deviceTypeId,
+	// 		codeNum:primaryDev[i].codeNum,
+	// 	}
+
+	// 	var xhttp = new XMLHttpRequest()
+	// 	xhttp.open('POST','https://conexumhome.connectble.com/v6/extender/'+primaryDev[i].extenderId+'/ircode/',true)
+	// 	xhttp.setRequestHeader("Content-type", "application/Json");
+	// 	xhttp.setRequestHeader("Authorization", "MT5dct51Y4YAmEyPsq0pWSINciE9kWrK9YobLJ8Hk32kPyFQo9NgCqoWKDj7G75O");
+	// 	xhttp.send(JSON.stringify(data))
+
+	// 	xhttp.onreadystatechange = function() {
+	// 		// console.log(primaryDev)
+	// 		// console.log(i)
+			
+
+	// 		var response = JSON.parse(xhttp.response)
+	// 		var ksTemp1 = []
+	// 		var ksTemp2 = []
+	// 		if(JSON.parse(window.localStorage.getItem('deviceType')).AV.includes(primaryDev[i].deviceTypeId)){
+	// 			ksTemp1 = response.result_data.AV.KeyLabel7
+			
+	// 		}else{
+	// 			ksTemp1 = response.result_data.AC.KeyLabel7
+	// 		}
+			
+
+	// 		for(var keyId in ksTemp1){
+	// 			ksTemp2.push({
+	// 				keyId:keyId,
+	// 				keyName:ksTemp1[keyId]
+	// 			})
+	// 		}
+	// 		// console.log(ksTemp2)
+	// 		ks[i] = [] 
+	// 		for(var j=0;j<ksTemp2.length;j++){
+				
+	// 			if(j%5==0){
+	// 				ks[i][Math.floor(j/5)]=[]
+	// 			}
+	// 			ks[i][Math.floor(j/5)][j%5] = ksTemp2[j]
+	// 		}
+
+	// 		// console.log('primaryDev.length')
+	// 		// console.log(primaryDev.length)
+	// 		i++
+
+	// 		if(i<primaryDev.length){
+	// 			console.log('if')
+				
+				
+	// 			window.sendKeyRequest(i,primaryDev,ks)
+	// 		}else{
+
+	// 			vueD.keys = ks
+				
+	// 			console.log('vued')
+	// 			console.log(vueD)
+
+	// 			$('.cmd-carousel-item:first-child').addClass('active')
+	// 			return
+	// 			// console.log('else')
+	// 			// console.log(ks)
+	// 			// console.log(ks.length)
+	// 			// return 1
+	// 		}
+			
+	// 	}
+	// }
+
+	function sendKeyRequest(i,primaryDev){
+		// console.log('primaryDev')
+		// console.log(primaryDev)
+
+		console.log(i)
+
+	
+
+		$.ajax({
+			type:'POST',
+			url:'https://conexumhome.connectble.com/v6/extender/'+primaryDev[i].extenderId+'/ircode/',
+			async:true,
+			dataType:'json',
+			data:{
+				function_id:7,
+				region:primaryDev[i].region,
+				deviceId:primaryDev[i].deviceTypeId,
+				codeNum:primaryDev[i].codeNum,
+			},
+			headers:{
+				"Authorization":"MT5dct51Y4YAmEyPsq0pWSINciE9kWrK9YobLJ8Hk32kPyFQo9NgCqoWKDj7G75O"
+			},
+			success: function(res){
+				var ksTemp1 = []
+				var ksTemp2 = []
+				if(JSON.parse(window.localStorage.getItem('deviceType')).AV.includes(primaryDev[i].deviceTypeId)){
+					ksTemp1 = res.result_data.AV.KeyLabel7
+				
+				}else{
+					ksTemp1 = res.result_data.AC.KeyLabel7
+				}
+
+				for(var keyId in ksTemp1){
+					ksTemp2.push({
+						keyId:keyId,
+						keyName:ksTemp1[keyId]
+					})
+				}
+				// console.log(ksTemp2)
+				ks[i] = [] 
+				for(var j=0;j<ksTemp2.length;j++){
+					
+					if(j%5==0){
+						ks[i][Math.floor(j/5)]=[]
+					}
+					ks[i][Math.floor(j/5)][j%5] = ksTemp2[j]
+				}
+
+				i++
+
+				if(i<primaryDev.length){
+					console.log('if')
+					
+					
+					window.sendKeyRequest(i,primaryDev,ks)
+				}else{
+
+					vueD.keys = ks
+					
+					console.log('vued')
+					console.log(vueD)
+
+					// console.log($('#cmd-carousel-inner').children())
+					// console.log(document.getElementById('cmd-carousel-inner').children)
+					// console.log(document.getElementsByClassName('cmd-carousel-item'))
+					// console.log($('.cmd-carousel-item'))
+					vueD.$nextTick(function(){
+						alert('devices loaded')
+						$('.cmd-carousel-item:first-child').addClass('active')
+					})
+					return
+					// console.log('else')
+					// console.log(ks)
+					// console.log(ks.length)
+					// return 1
+				}
+			}
+			
+
+		})
+
+	
+		
+
+			// // console.log('primaryDev.length')
+			// // console.log(primaryDev.length)
+			
+			
+		
+	}
 	
 </script>
+
 
 <script id="cmd-controls">
 	var length = $('#cmd-carousel-inner').children().length
@@ -285,8 +626,8 @@ header {
 	
 </script>
 
-<script>
-  
+<script id="updateActive">
+	
 </script>
 
 <script id="clickCmd">

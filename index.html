@@ -90,8 +90,9 @@
 				}}</span> <span class="text-white d-block sidebar-name">Community</span> <span
 				class="text-white d-block sidebar-name">Extender</span> <span
 				class="text-white d-block sidebar-name text-nowrap">Voice
-				Command List</span> <span class="text-white d-block sidebar-name">Smart
-				Profile</span> <span class="text-white d-block sidebar-name">User
+				Command List</span> 
+				<span class="text-white d-block sidebar-name" id="smart-profile">Smart	Profile</span>
+				<span class="text-white d-block sidebar-name">User
 				manua</span> <span class="text-white d-block sidebar-name">Privacy &
 				Policy</span> <span class="text-white d-block sidebar-name">Contact
 				us</span> <span class="text-white d-block sidebar-name">Agreement</span> <span
@@ -101,7 +102,11 @@
 		</div>
 
 		<div id="shade"></div>
-		<iframe src="location.html" id="content" class="h-100 w-100"></iframe>
+		<iframe src="" id="content" class="h-100 w-100 d-none"></iframe>
+		<button class="btn btn-primary loading m-auto" type="button" disabled>
+			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+			Loading...
+		</button>
 
 		<div class="time d-md-flex d-none align-items-center font-weight-bold">
 			<span id="timer"></span>
@@ -196,8 +201,11 @@
   xhttp.send()
   xhttp.onreadystatechange = function() {
     primaryData = JSON.parse(xhttp.response)
-    console.log(primaryData)
+    //console.log(primaryData)
 		window.localStorage.setItem('primaryData',JSON.stringify(primaryData))
+		$('.loading').css("display","none")
+		$("#content").attr('src','location.html')
+		$('#content').removeClass('d-none')
 		
 		new Vue({
 			el:'#userName',
@@ -211,14 +219,21 @@
 		location:0,
 		zone:0,
 		device:0,
+		color:''
 	}
 
 	var deviceBg=['./images/bg/z-bg-r.jpg','./images/bg/z-bg-g.jpg','./images/bg/z-bg-b.jpg','./images/bg/z-bg-y.jpg','./images/bg/z-bg-v.jpg','./images/bg/z-bg-p.jpg']
 	var deviceBgC = ['rgb(255, 102, 102)','rgb(153, 204, 153)','rgb(153, 153, 255)','rgb(204, 204, 102)','rgb(153, 102, 204)','rgb(255, 153, 255)']
 
+	var deviceType={
+		AV:["1", "12", "11", "10", "6", "72", "9", "13", "5", "36", "7", "2", "25"],
+		AC:["0", "71", "68", "76", "73", "75"]
+	}
+
 	window.localStorage.setItem('choice',JSON.stringify(choice))
 	window.localStorage.setItem('deviceBg',JSON.stringify(deviceBg))
 	window.localStorage.setItem('deviceBgC',JSON.stringify(deviceBgC))
+	window.localStorage.setItem('deviceType',JSON.stringify(deviceType))
 
 	//check whehter local storage supported
 	if(!window.localStorage){

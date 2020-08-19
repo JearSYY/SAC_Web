@@ -60,7 +60,7 @@ body {
 				<div id="locations-carousel" class="carousel" data-interval="false">
 					<div class="carousel-inner">
 
-						<div class="carousel-item " v-for='(item1,i1) in locationsName'
+						<div class="carousel-item location-item" v-for='(item1,i1) in locationsName'
 							:id="'location-item'+i1">
 							<button class="btn btn-light mr-1 btn-loc px-5"
 								v-for='(item2,i2) in locationsName[i1]'
@@ -77,9 +77,9 @@ body {
 					Location</button>
 			</div>
 
-			<div id="loc-indicators" class="d-flex justify-content-center">
-				<span id="1" class="indicator loc-indicator loc-ind-active"></span>
-				<span id="2" class="indicator loc-indicator"></span>
+			<div id="loc-indicators" class="d-flex justify-content-center" >
+				<span v-for="(item,i) in locationsName" :id="i+1" class="indicator loc-indicator"></span>
+				<!-- <span id="2" class="indicator loc-indicator"></span> -->
 			</div>
 			<hr class="my-2" style="height: 5px; background-color: white;">
 		</div>
@@ -90,11 +90,11 @@ body {
 				class="carousel slide carousel-fade px-5 pt-4" data-interval="false">
 
 				<div id="zones" class="carousel-inner">
-					<div class="carousel-item" v-for='(item,i1) in zones'
+					<div class="carousel-item zone-item" v-for='(item,i1) in zones'
 						:id="'zone-item'+i1">
 						<div class="row row-cols-3">
-							<div class="col mb-4" v-for='(item,i2) in zones[i1]'>
-								<div class="card zone text-white" :id="'zone'+(i1*6+i2)">
+							<div class="col mb-4" v-for='(item,i2) in zones[i1]' >
+								<div class="card zone text-white" :id="'zone'+(i1*6+i2)" @click="gotoZone">
 									<div class="card-header zone-card-header px-2"
 										:style="{'background-image': 'url('+item.deviceBg+')'}">
 										<h5 class="card-title text-white ml-2">{{
@@ -334,8 +334,8 @@ body {
 				</div>
 
 				<div id="z-indicators" class="d-flex justify-content-center">
-					<span id="1" class="indicator z-indicator z-ind-active"></span> <span
-						id="2" class="indicator z-indicator"></span>
+					<span v-for="(item,i) in zones" :id="i+1" class="indicator z-indicator"></span> 
+					<!-- <span id="2" class="indicator z-indicator"></span> -->
 				</div>
 			</div>
 		</div>
@@ -368,11 +368,21 @@ body {
 						alert('No zones in this location!')
 						window.localStorage.setItem('choice',JSON.stringify(choiceOrigin))
 					}else{
-						$('.btn-loc.active').removeClass("active")
-						e.currentTarget.classList.add("active")
+						
+						updateActive()
 						this.zones=getZones()
 					}
 					console.log(this)
+				},
+
+				gotoZone:function(e){
+					
+					console.log(e.currentTarget.id)
+					var choiceOrigin = JSON.parse(window.localStorage.getItem('choice'))
+					var choiceTemp = {location:choiceOrigin.location,zone:e.currentTarget.id.substring(4,5),device:0}
+					window.localStorage.setItem('choice',JSON.stringify(choiceTemp))
+					$("#content",window.parent.document).attr('src','zone.html')
+
 				}
 			}
 		})
@@ -421,32 +431,34 @@ body {
 
 		return zones
 	}
+
+	updateActive()
+
+	function updateActive(){
+		$('.btn-loc.active').removeClass("active")
+		$('.location-item').removeClass('active')
+		$('.zone-item').removeClass('active')
+
+		var choice = JSON.parse(window.localStorage.getItem('choice'))
+
+		l1 = Math.floor(choice.location/4)
+		l2 = choice.location
+		z1 = Math.floor(choice.zone/6)
+
+		document.getElementById('location-item'+l1).classList.add("active")
+		document.getElementById('location'+l2).classList.add("active")
+		document.getElementById('zone-item'+z1).classList.add("active")
+	}
 		
 
-	//define the clicking function when choosing a location
-	// $('.btn-loc').click(function(e){
-	// 	$('.btn-loc.active').removeClass("active")
-	// 	this.classList.add("active")
-
-	// 	console.log(e.currentTarget.id)
-	// 	var choiceTemp = {location:e.currentTarget.id.substring(8,9),zone:0}
-	// 	window.localStorage.setItem('choice',JSON.stringify(choiceTemp))
-		
-	// })
 	
 </script>
 
 <script id="toggle indicators">
 	//transform the collection to array so that can get the index of the element easily.
-	var choice = JSON.parse(window.localStorage.getItem('choice'))
-
-	l1 = Math.floor(choice.location/4)
-	l2 = choice.location
-	z1 = Math.floor(choice.zone/6)
-
-	document.getElementById('location-item'+l1).classList.add("active")
-	document.getElementById('location'+l2).classList.add("active")
-	document.getElementById('zone-item'+z1).classList.add("active")
+	$('.loc-indicator:first-child').addClass('loc-ind-active')
+	$('.z-indicator:first-child').addClass('z-ind-active')
+	
 
 	var locationIndicators = Array.from(document.getElementsByClassName("loc-indicator"))
 	console.log(locationIndicators.length)
@@ -479,14 +491,14 @@ body {
 	
 </script>
 <script id="gotoZone">
-	$('.zone').click(function(e){
-		console.log(e.currentTarget.id)
-		var choiceOrigin = JSON.parse(window.localStorage.getItem('choice'))
-		var choiceTemp = {location:choiceOrigin.location,zone:e.currentTarget.id.substring(4,5),device:0}
-		window.localStorage.setItem('choice',JSON.stringify(choiceTemp))
-		$("#content",window.parent.document).attr('src','zone.html')
+	// $('.zone').click(function(e){
+	// 	console.log(e.currentTarget.id)
+	// 	var choiceOrigin = JSON.parse(window.localStorage.getItem('choice'))
+	// 	var choiceTemp = {location:choiceOrigin.location,zone:e.currentTarget.id.substring(4,5),device:0}
+	// 	window.localStorage.setItem('choice',JSON.stringify(choiceTemp))
+	// 	$("#content",window.parent.document).attr('src','zone.html')
 		
-	})
+	// })
 </script>
 
 
