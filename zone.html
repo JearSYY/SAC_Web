@@ -328,6 +328,8 @@ body {
 	updateData()
 	function updateData(){
 		
+		window.sessionStorage.setItem('keys',new Array())
+
 		var vueL = new Vue({
 			el:'#content',
 			data:{
@@ -366,10 +368,19 @@ body {
 						}
 						this.numOfDevs=devLength()
 
+						this.$nextTick(function(){
+							for (i in this.numOfDevs){
+								console.log(i+" time")
+								
+								//console.log($('#dev-frame'+i))
+								$('#dev-frame'+i)[0].contentWindow.parameter = i
+								
 
-						for (i in this.numOfDevs){
-							$('#dev-frame'+i).contents().find('#zoneController').click()
-						}
+								$('#dev-frame'+i).contents().find('#zoneController').click()
+								
+							}
+						})
+					
 					}
 
 					updateActive()
@@ -389,14 +400,24 @@ body {
 						// $('.btn-z.active').removeClass("active")
 						// e.currentTarget.classList.add("active")
 						this.numOfDevs=devLength()
-
+						console.log('numOfDevs')
+						console.log(this.numOfDevs)
 						
+						this.$nextTick(function(){
+							for (i in this.numOfDevs){
+								console.log(i+" time")
+								
+								console.log($('#dev-frame'+i))
+								$('#dev-frame'+i)[0].contentWindow.parameter = i
 
-						for (i in this.numOfDevs){
-							console.log(i+' times')
-							$('#dev-frame'+i).contents().find('#zoneController').click()
-							
-						}
+								var j=i
+
+								
+								$('#dev-frame'+j).contents().find('#zoneController').click()
+								
+								
+							}
+						})
 					
 						updateActive()
 					}
@@ -494,6 +515,7 @@ body {
 
 		$('.btn-loc.active').removeClass('active')
 		$('.btn-z').removeClass('active')
+		$('.dev-carousel-item').removeClass('active')
 
 		document.getElementById('location-item'+l1).classList.add("active")
 		document.getElementById('location'+l2).classList.add("active")

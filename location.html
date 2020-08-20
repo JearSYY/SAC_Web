@@ -133,91 +133,7 @@ body {
 									</div>
 								</div>
 							</div>
-							<!-- <div class="col mb-4">
-								<div class="card zone">
-									<div class="card-header zone-card-header px-2"
-										style="background-image: url('./images/bg/z-bg-g.jpg');">
-										<h5 class="card-title text-white">Card title</h5>
-										<hr style="background-color: white; color: white; height: 1px;">
-									</div>
-									<div class="card-body devices"
-										style="background-color: rgb(153, 204, 153);">
-										<p class="card-text">This is a longer ceT a little bit
-											longer.</p>
-										<p class="card-text">
-											<small class="text-muted">Last updated 3 mins ago</small>
-										</p>
-									</div>
-								</div>
-							</div>
-							<div class="col mb-4">
-								<div class="card zone">
-									<div class="card-header zone-card-header px-2"
-										style="background-image: url('./images/bg/z-bg-b.jpg');">
-										<h5 class="card-title text-white">Card title</h5>
-										<hr style="background-color: white; color: white; height: 1px;">
-									</div>
-									<div class="card-body devices"
-										style="background-color: rgb(153, 153, 255);">
-										<p class="card-text">This is a longer ceT a little bit
-											longer.</p>
-										<p class="card-text">
-											<small class="text-muted">Last updated 3 mins ago</small>
-										</p>
-									</div>
-								</div>
-							</div>
-							<div class="col mb-4">
-								<div class="card zone">
-									<div class="card-header zone-card-header px-2"
-										style="background-image: url('./images/bg/z-bg-y.jpg');">
-										<h5 class="card-title text-white">Card title</h5>
-										<hr style="background-color: white; color: white; height: 1px;">
-									</div>
-									<div class="card-body devices"
-										style="background-color: rgb(204, 204, 102);">
-										<p class="card-text">This is a longer ceT a little bit
-											longer.</p>
-										<p class="card-text">
-											<small class="text-muted">Last updated 3 mins ago</small>
-										</p>
-									</div>
-								</div>
-							</div>
-							<div class="col mb-4">
-								<div class="card zone">
-									<div class="card-header zone-card-header px-2"
-										style="background-image: url('./images/bg/z-bg-v.jpg');">
-										<h5 class="card-title text-white">Card title</h5>
-										<hr style="background-color: white; color: white; height: 1px;">
-									</div>
-									<div class="card-body devices"
-										style="background-color: rgb(153, 102, 204);">
-										<p class="card-text">This is a longer ceT a little bit
-											longer.</p>
-										<p class="card-text">
-											<small class="text-muted">Last updated 3 mins ago</small>
-										</p>
-									</div>
-								</div>
-							</div>
-							<div class="col mb-4">
-								<div class="card zone">
-									<div class="card-header zone-card-header px-2"
-										style="background-image: url('./images/bg/z-bg-p.jpg');">
-										<h5 class="card-title text-white">Card title</h5>
-										<hr style="background-color: white; color: white; height: 1px;">
-									</div>
-									<div class="card-body devices"
-										style="background-color: rgb(255, 153, 255);">
-										<p class="card-text">This is a longer ceT a little bit
-											longer.</p>
-										<p class="card-text">
-											<small class="text-muted">Last updated 3 mins ago</small>
-										</p>
-									</div>
-								</div>
-							</div> -->
+							
 						</div>
 
 
@@ -334,7 +250,7 @@ body {
 				</div>
 
 				<div id="z-indicators" class="d-flex justify-content-center">
-					<span v-for="(item,i) in zones" :id="i+1" class="indicator z-indicator"></span> 
+					<span v-for="(item,i) in zones" :id="i+1" class="indicator z-indicator" @click="toggleZone"></span> 
 					<!-- <span id="2" class="indicator z-indicator"></span> -->
 				</div>
 			</div>
@@ -383,6 +299,16 @@ body {
 					window.localStorage.setItem('choice',JSON.stringify(choiceTemp))
 					$("#content",window.parent.document).attr('src','zone.html')
 
+				},
+
+				toggleZone:function(e){
+					var zoneIndicators = Array.from(document.getElementsByClassName("z-indicator"))
+					
+					console.log('11111')
+					$('#zones-carousel').carousel(zoneIndicators.indexOf(e.currentTarget));
+					document.getElementsByClassName("z-ind-active")[0].classList.remove("z-ind-active")
+					e.currentTarget.classList.add("z-ind-active")
+					
 				}
 			}
 		})
@@ -472,17 +398,7 @@ body {
 		})
 	}
 
-	var zoneIndicators = Array.from(document.getElementsByClassName("z-indicator"))
-	console.log(zoneIndicators.length)
-
-	for(var i=0;i<zoneIndicators.length;i++){
-		zoneIndicators[i].addEventListener("click",function(){
-			
-			$('#zones-carousel').carousel(zoneIndicators.indexOf(this));
-			document.getElementsByClassName("z-ind-active")[0].classList.remove("z-ind-active")
-			this.classList.add("z-ind-active")
-		})
-	}
+	
 </script>
 
 

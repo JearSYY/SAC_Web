@@ -226,8 +226,7 @@ header {
 			},
 			methods:{
 				changeZone(){
-					console.log('parameter')
-					console.log(window.parameter)
+					console.log('parameter '+devIndex)
 					this.devices=getDevices()
 					getKeys()
 					//console.log(this)
@@ -409,13 +408,28 @@ header {
 	function getKeys(){
 		var index = 0
 		var choice = JSON.parse(window.localStorage.choice)
-		var primaryDev = JSON.parse(window.localStorage.primaryData).locations[choice.location].extenders[choice.zone].zones[0].devices
-		ks = []
-		sendKeyRequest(index,primaryDev)
-		// console.log("ks")
-		// console.log(ks)
-		// console.log(ks[0])
-		// return ks
+		var devIndex = parseInt(window.parameter)
+
+		if(window.sessionStorage.getItem('keys')[devIndex]){
+			vueD.keys = JSON.parse(window.sessionStorage.getItem('keys'))[devIndex]
+			vueD.$nextTick(function(){
+				// console.log('page '+devIndex+' dev '+i+" finished")
+				console.log('vued')
+				console.log(vueD)
+				$('.cmd-carousel-item:first-child').addClass('active')
+			})
+		}else{
+			var primaryDev = JSON.parse(window.localStorage.primaryData).locations[choice.location].extenders[choice.zone].zones[0].devices
+			var t = (devIndex+1)*4>primaryDev.length?primaryDev.length:(devIndex+1)*4
+			var b = devIndex*4
+			var pageDev = primaryDev.slice(b,t)
+			console.log('page '+devIndex)
+
+			console.log('pageDev')
+			console.log(pageDev)
+			ks = []
+			sendKeyRequest(index,pageDev)
+		}
 	}
 
 	// function sendKeyRequest(i,primaryDev){
@@ -496,9 +510,10 @@ header {
 	// 	}
 	// }
 
-	function sendKeyRequest(i,primaryDev){
+	function sendKeyRequest(i,pageDev){
 		// console.log('primaryDev')
 		// console.log(primaryDev)
+		var devIndex = window.parameter
 
 		console.log(i)
 
@@ -506,14 +521,15 @@ header {
 
 		$.ajax({
 			type:'POST',
-			url:'https://conexumhome.connectble.com/v6/extender/'+primaryDev[i].extenderId+'/ircode/',
+			url:'https://conexumhome.connectble.com/v6/extender/'+pageDev[i].extenderId+'/ircode/',
 			async:true,
+			timeout:3000,
 			dataType:'json',
 			data:{
 				function_id:7,
-				region:primaryDev[i].region,
-				deviceId:primaryDev[i].deviceTypeId,
-				codeNum:primaryDev[i].codeNum,
+				region:pageDev[i].region,
+				deviceId:pageDev[i].deviceTypeId,
+				codeNum:pageDev[i].codeNum,
 			},
 			headers:{
 				"Authorization":"MT5dct51Y4YAmEyPsq0pWSINciE9kWrK9YobLJ8Hk32kPyFQo9NgCqoWKDj7G75O"
@@ -521,7 +537,7 @@ header {
 			success: function(res){
 				var ksTemp1 = []
 				var ksTemp2 = []
-				if(JSON.parse(window.localStorage.getItem('deviceType')).AV.includes(primaryDev[i].deviceTypeId)){
+				if(JSON.parse(window.localStorage.getItem('deviceType')).AV.includes(pageDev[i].deviceTypeId)){
 					ksTemp1 = res.result_data.AV.KeyLabel7
 				
 				}else{
@@ -544,28 +560,38 @@ header {
 					ks[i][Math.floor(j/5)][j%5] = ksTemp2[j]
 				}
 
+				
+				
+				console.log('page '+devIndex+' dev '+i+' ks')
+				
+				
+
+				
 				i++
 
-				if(i<primaryDev.length){
+				if(i<pageDev.length){
 					console.log('if')
 					
 					
-					window.sendKeyRequest(i,primaryDev,ks)
+					window.sendKeyRequest(i,pageDev,ks)
 				}else{
 
+					console.log('page '+devIndex+" finished")
+
 					vueD.keys = ks
+					console.log(ks)
+					vueD.$nextTick(function(){
+						// console.log('page '+devIndex+' dev '+i+" finished")
+						
+						$('.cmd-carousel-item:first-child').addClass('active')
+					})
 					
-					console.log('vued')
-					console.log(vueD)
 
 					// console.log($('#cmd-carousel-inner').children())
 					// console.log(document.getElementById('cmd-carousel-inner').children)
 					// console.log(document.getElementsByClassName('cmd-carousel-item'))
 					// console.log($('.cmd-carousel-item'))
-					vueD.$nextTick(function(){
-						alert('devices loaded')
-						$('.cmd-carousel-item:first-child').addClass('active')
-					})
+					
 					return
 					// console.log('else')
 					// console.log(ks)

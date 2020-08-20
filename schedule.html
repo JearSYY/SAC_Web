@@ -10,7 +10,10 @@
 <style>
 .header {
 	width: 100%;
-	height: 25%;
+	height: 23%;
+}
+.content{
+	height:75%;
 }
 
 .body {
@@ -24,11 +27,25 @@
 	margin-right: 30px;
 	margin-left: 70px;
 }
+
+.rule{
+	border-radius: 10px;
+	border: 3px solid rgb(230,230,230);
+	height:50px;
+
+}
+
+.rgp{
+	background-color: rgb(180,180,180);
+	height:80px;
+	color:white;
+}
+
 </style>
 </head>
 
 <body >
-	<div class="header d-flex" style="background-color: rgb(210,210,210);">
+	<div class="header d-flex" style="background-color: rgb(230,230,230);">
 		<img src="./images/common icon/smart-profile-icon.png" class="sp-icon" 
 			alt="">
 		<div class="title">
@@ -38,11 +55,59 @@
 	</div>
 	<div class="content">
 
-		<div id="schedules-carousel" class="carousel" data-interval="false">
+		<div id="schedules-carousel" class="carousel" data-interval="false" style="height:100%;">
+
+
 			<div class="carousel-inner">
-				<div class="carousel-item schedule-item active">
+				<div class="carousel-item schedule-item active" v-for="(item1,i1) in ruleGroupList">
+					<div class="row" style="border-bottom: 3px solid rgb(230,230,230);" v-for="(item2,i2) in ruleGroupList[i1]">
+						<div class="col-4 rgp d-flex justify-content-center align-items-center" >
+							<span style="font-weight: bold;font-size: large;">{{item2.name}}</span>
+						</div>
+						<div class="col-8 d-flex align-items-center" style="height:80px;">
+							<div class="rule d-flex justify-content-center align-items-center mx-2" v-for="(item3,i3) in ruleGroupList[i1][i2].rules" v-if="ruleGroupList[i1][i2].rules.length!=0">
+								<span style="font-weight: bold;" class="mx-3" v-cloak>{{item3.name}}</span>
+							</div>
+							<span class="ml-3" v-if="ruleGroupList[i1][i2].rules.length==0">No rules in this rule group, please add rules.</span>
+						</div>
+					</div>
+					<!-- <div class="row" style="border-bottom: 3px solid rgb(230,230,230);">
+						<div class="col-4" style="background-color: rgb(180,180,180);height:80px;"></div>
+						<div class="col-8" style="height:80px;"></div>
+					</div>
+					<div class="row" style="border-bottom: 3px solid rgb(230,230,230);">
+						<div class="col-4" style="background-color: rgb(180,180,180);height:80px;"></div>
+						<div class="col-8" style="height:80px;"></div>
+					</div>
+					<div class="row" style="border-bottom: 3px solid rgb(230,230,230);">
+						<div class="col-4" style="background-color: rgb(180,180,180);height:80px;"></div>
+						<div class="col-8" style="height:80px;"></div>
+					</div>
+					<div class="row" style="border-bottom: 3px solid rgb(230,230,230);">
+						<div class="col-4" style="background-color: rgb(180,180,180);height:80px;"></div>
+						<div class="col-8" style="height:80px;"></div>
+					</div>
+					<div class="row" style="border-bottom: 3px solid rgb(230,230,230);">
+						<div class="col-4" style="background-color: rgb(180,180,180);height:80px;"></div>
+						<div class="col-8" style="height:80px;"></div>
+					</div>
+					<div class="row" style="border-bottom: 3px solid rgb(230,230,230);">
+						<div class="col-4" style="background-color: rgb(180,180,180);height:80px;"></div>
+						<div class="col-8" style="height:80px;"></div>
+					</div>
+					<div class="row" style="border-bottom: 3px solid rgb(230,230,230);">
+						<div class="col-4" style="background-color: rgb(180,180,180);height:80px;"></div>
+						<div class="col-8" style="height:80px;"></div>
+					</div> -->
+
 					
 				</div>
+			</div>
+
+			<div id="sch-indicators" class="d-flex justify-content-center mt-3">
+				<!-- <span v-for="(item,i) in zones" :id="i+1" class="indicator sch-indicator" @click="toggleSch"></span>  -->
+				<span id="2" class="indicator sch-indicator sch-ind-active"></span>
+				<span id="2" class="indicator sch-indicator"></span>
 			</div>
 		</div>
 
@@ -52,6 +117,46 @@
 
 <script src="./js/jquery.min.js"></script>
 <script src="./js/bootstrap.bundle.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+
+<script id="getData">
+	var primaryData = JSON.parse(window.localStorage.getItem('primaryData'))
+	var choice = JSON.parse(window.localStorage.getItem('choice'))
+
+
+
+	updateData()
+	function updateData(){
+		
+
+		vueSch = new Vue({
+			el:'.content',
+			data:{
+				ruleGroupList:getRulegroups(),
+      	locationId: primaryData.locations[choice.location].id,
+			},
+			methods:{
+
+			}
+		})
+
+		console.log(vueSch)
+	}
+
+	function getRulegroups(){
+		var primaryRgp = primaryData.locations[choice.location].ruleGroups
+		var rpg = [] 
+
+		for (var i =0; i<primaryRgp.length;i++){
+			if(i%8==0){
+				rpg[Math.floor(i/8)]=[]
+			}
+			rpg[Math.floor(i/8)][i%8]=primaryRgp[i]
+		}
+		return rpg
+	}
+	
+</script>
 
 
 </html>

@@ -39,7 +39,7 @@ button:hover {
 	background-color: #c5c6c7;
 }
 
-.loc-ind-active, .z-ind-active {
+.loc-ind-active, .z-ind-active, .sch-ind-active {
 	background-color: #00e1ff;
 }
 
