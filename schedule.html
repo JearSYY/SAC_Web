@@ -29,7 +29,7 @@
 }
 
 .rule{
-	border-radius: 10px;
+	border-radius: 20px;
 	border: 3px solid rgb(230,230,230);
 	height:50px;
 
@@ -55,59 +55,55 @@
 	</div>
 	<div class="content">
 
+		<div class="locations d-flex pb-2 pl-3 w-100" style="background-color: rgb(230,230,230);">
+			<div id="locations-carousel" class="carousel" data-interval="false">
+				<div class="carousel-inner">
+
+					<div class="carousel-item location-item" v-for='(item1,i1) in locationsName'
+						:id="'location-item'+i1">
+						<button class="btn btn-light mr-2 btn-loc px-5"
+							v-for='(item2,i2) in locationsName[i1]'
+							:id="'location'+(i1*6+i2)" v-on:click="changeLocation">{{
+							item2 }}</button>
+						<!-- <button class="btn btn-light mr-1 btn-loc px-5">office</button> -->
+					</div>
+
+
+				</div>
+
+				<div id="loc-indicators" class="d-flex justify-content-center mt-2" >
+					<span v-for="(item,i) in locationsName" :id="i+1" class="indicator loc-indicator" @click="toggleLoc"></span>
+					<!-- <span id="2" class="indicator loc-indicator"></span> -->
+				</div>
+			</div>
+		</div>
+
 		<div id="schedules-carousel" class="carousel" data-interval="false" style="height:100%;">
 
 
 			<div class="carousel-inner">
-				<div class="carousel-item schedule-item active" v-for="(item1,i1) in ruleGroupList">
+				<div class="carousel-item sch-item" v-for="(item1,i1) in ruleGroupList">
 					<div class="row" style="border-bottom: 3px solid rgb(230,230,230);" v-for="(item2,i2) in ruleGroupList[i1]">
 						<div class="col-4 rgp d-flex justify-content-center align-items-center" >
-							<span style="font-weight: bold;font-size: large;">{{item2.name}}</span>
+							<span style="font-weight: bold;font-size: large;">{{item2.name}}{{console.log(item2.enable)}}</span>
 						</div>
-						<div class="col-8 d-flex align-items-center" style="height:80px;">
+						<div class="col-1 rgp d-flex justify-content-center align-items-center">
+							<img src="./images/common icon/checked-b.png" alt="" v-if="item2.enable">
+						</div>
+						<div class="col-7 d-flex align-items-center" style="height:80px;">
 							<div class="rule d-flex justify-content-center align-items-center mx-2" v-for="(item3,i3) in ruleGroupList[i1][i2].rules" v-if="ruleGroupList[i1][i2].rules.length!=0">
 								<span style="font-weight: bold;" class="mx-3" v-cloak>{{item3.name}}</span>
 							</div>
 							<span class="ml-3" v-if="ruleGroupList[i1][i2].rules.length==0">No rules in this rule group, please add rules.</span>
 						</div>
 					</div>
-					<!-- <div class="row" style="border-bottom: 3px solid rgb(230,230,230);">
-						<div class="col-4" style="background-color: rgb(180,180,180);height:80px;"></div>
-						<div class="col-8" style="height:80px;"></div>
-					</div>
-					<div class="row" style="border-bottom: 3px solid rgb(230,230,230);">
-						<div class="col-4" style="background-color: rgb(180,180,180);height:80px;"></div>
-						<div class="col-8" style="height:80px;"></div>
-					</div>
-					<div class="row" style="border-bottom: 3px solid rgb(230,230,230);">
-						<div class="col-4" style="background-color: rgb(180,180,180);height:80px;"></div>
-						<div class="col-8" style="height:80px;"></div>
-					</div>
-					<div class="row" style="border-bottom: 3px solid rgb(230,230,230);">
-						<div class="col-4" style="background-color: rgb(180,180,180);height:80px;"></div>
-						<div class="col-8" style="height:80px;"></div>
-					</div>
-					<div class="row" style="border-bottom: 3px solid rgb(230,230,230);">
-						<div class="col-4" style="background-color: rgb(180,180,180);height:80px;"></div>
-						<div class="col-8" style="height:80px;"></div>
-					</div>
-					<div class="row" style="border-bottom: 3px solid rgb(230,230,230);">
-						<div class="col-4" style="background-color: rgb(180,180,180);height:80px;"></div>
-						<div class="col-8" style="height:80px;"></div>
-					</div>
-					<div class="row" style="border-bottom: 3px solid rgb(230,230,230);">
-						<div class="col-4" style="background-color: rgb(180,180,180);height:80px;"></div>
-						<div class="col-8" style="height:80px;"></div>
-					</div> -->
-
 					
 				</div>
 			</div>
 
 			<div id="sch-indicators" class="d-flex justify-content-center mt-3">
 				<!-- <span v-for="(item,i) in zones" :id="i+1" class="indicator sch-indicator" @click="toggleSch"></span>  -->
-				<span id="2" class="indicator sch-indicator sch-ind-active"></span>
-				<span id="2" class="indicator sch-indicator"></span>
+				<span id="2" class="indicator sch-indicator" v-for="(item1,i1) in ruleGroupList" @click="toggleSch"></span>
 			</div>
 		</div>
 
@@ -123,7 +119,7 @@
 	var primaryData = JSON.parse(window.localStorage.getItem('primaryData'))
 	var choice = JSON.parse(window.localStorage.getItem('choice'))
 
-
+	var vueSch
 
 	updateData()
 	function updateData(){
@@ -132,10 +128,37 @@
 		vueSch = new Vue({
 			el:'.content',
 			data:{
+				locIndex:choice.location,
 				ruleGroupList:getRulegroups(),
+				locationsName:getLocationsName(),
       	locationId: primaryData.locations[choice.location].id,
 			},
 			methods:{
+				toggleSch(e){
+					var index = $('#sch-indicators span').index(e.currentTarget)
+					console.log(index)
+					$('#schedules-carousel').carousel(index);
+
+					//to toggle acitve state
+					$('.sch-ind-active').removeClass("sch-ind-active")
+					e.currentTarget.classList.add("sch-ind-active")
+				},
+				toggleLoc(e){
+					var index = $('#loc-indicators span').index(e.currentTarget)
+					console.log(index)
+					$('#locations-carousel').carousel(index);
+
+					//to toggle acitve state
+					$('.loc-ind-active').removeClass("loc-ind-active")
+					e.currentTarget.classList.add("loc-ind-active")
+				},
+				changeLocation:function(e){
+					console.log(e.currentTarget.id)
+					this.locIndex = e.currentTarget.id.substring(8,9)
+					this.ruleGroupList=getRulegroups()
+					console.log(this)
+					updateActive()
+				},
 
 			}
 		})
@@ -143,18 +166,56 @@
 		console.log(vueSch)
 	}
 
-	function getRulegroups(){
-		var primaryRgp = primaryData.locations[choice.location].ruleGroups
-		var rpg = [] 
-
-		for (var i =0; i<primaryRgp.length;i++){
-			if(i%8==0){
-				rpg[Math.floor(i/8)]=[]
+	
+	function getLocationsName(){
+		var primaryData = JSON.parse(window.localStorage.primaryData)
+		var locationsName =[]
+		for (var i = 0;i< primaryData.locations.length;i++){
+			if(i%6==0){
+				locationsName[Math.floor(i/6)]=[]
 			}
-			rpg[Math.floor(i/8)][i%8]=primaryRgp[i]
+			locationsName[Math.floor(i/6)][i%6]=primaryData.locations[i].name
+			
+		}
+		return locationsName
+	}
+
+	function getRulegroups(){
+		if(vueSch!=undefined){
+			var primaryRgp = primaryData.locations[vueSch.locIndex].ruleGroups
+		}
+		else{
+			var primaryRgp = primaryData.locations[choice.location].ruleGroups
+		}
+		var rpg = [] 
+		if (primaryRgp.length!=0){
+			for (var i =0; i<primaryRgp.length;i++){
+				if(i%7==0){
+					rpg[Math.floor(i/7)]=[]
+				}
+				rpg[Math.floor(i/7)][i%7]=primaryRgp[i]
+			}
 		}
 		return rpg
 	}
+
+	updateActive()
+
+	function updateActive(){
+		$('.btn-loc.active').removeClass("active")
+		$('.location-item').removeClass('active')
+
+		l1 = Math.floor(vueSch.locIndex/6)
+		l2 = vueSch.locIndex
+
+		document.getElementById('location-item'+l1).classList.add("active")
+		document.getElementById('location'+l2).classList.add("active")
+		$('.sch-indicator:first-child').addClass('sch-ind-active')
+		$('.sch-item:first-child').addClass('active')
+	}
+	$('.loc-indicator:first-child').addClass('loc-ind-active')
+
+
 	
 </script>
 

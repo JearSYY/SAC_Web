@@ -226,6 +226,7 @@ header {
 			},
 			methods:{
 				changeZone(){
+					var devIndex = window.parameter
 					console.log('parameter '+devIndex)
 					this.devices=getDevices()
 					getKeys()
@@ -288,26 +289,33 @@ header {
 									stFan:"FAN AUTO",
 									stSwing:"ON"
 								}
+								
 							}else{
-								var currentStatus = this.acStatus
+								var currentStatus = vueD.acStatus
+
+								console.log('currentStatus')
+								console.log(currentStatus)
 								
 								for (var i=0;i<statusList.length;i++){
 									if(keyid==statusList[i].keyId){
 										console.log("found keyid in statuslist")
+										console.log(keyid)
 										switch(keyid){
 											case "1":
 												break;
-											case "3":break;
+											case "3":
 											case "2":
 											case "4":
 											case "5":
 											case "7":  
 												for (var j=i;j<statusList.length;j++){
-												
-													if(currentStatus.stSwing==statusList[j].stSwing){
-														console.log("found status in statuslist")
-														targetStatus = statusList[j]
-													}else if(keyid!=statusList[j].keyId){break;}
+													console.log(j)
+													if(keyid==statusList[j].keyId){
+														if(currentStatus.stSwing==statusList[j].stSwing){
+															console.log("found status in statuslist")
+															targetStatus = statusList[j]
+														}
+													}else{break;}
 												}
 												break;
 											case "8":
@@ -315,29 +323,35 @@ header {
 											case "10":
 											case "11":
 												for (var j=i;j<statusList.length;j++){
-													if(currentStatus.stSwing==statusList[j].stSwing && currentStatus.stMode==statusList[j].stMode && currentStatus.stTemp==statusList[j].stTemp){
-														console.log("found status in statuslist")
-														targetStatus = statusList[j]
-													}else if(keyid!=statusList[j].keyId){break;}
+													if(keyid==statusList[j].keyId){
+														if(currentStatus.stSwing==statusList[j].stSwing && currentStatus.stMode==statusList[j].stMode && currentStatus.stTemp==statusList[j].stTemp){
+															console.log("found status in statuslist")
+															targetStatus = statusList[j]
+														}
+													}else {break;}
 												}
 												break;
 											case "12":break;
 											case "13":
 												for (var j=i;j<statusList.length;j++){
-													if(currentStatus.stSwing==statusList[j].stSwing && currentStatus.stMode==statusList[j].stMode &&
-														(parseInt(currentStatus.stTemp)+1).toString()==statusList[j].stTemp){
-														console.log("found status in statuslist")
-														targetStatus = statusList[j]
-													}else if(keyid!=statusList[j].keyId){break;}
+													if(keyid==statusList[j].keyId){
+														if(currentStatus.stSwing==statusList[j].stSwing && currentStatus.stMode==statusList[j].stMode &&
+															(parseInt(currentStatus.stTemp)+1).toString()==statusList[j].stTemp){
+															console.log("found status in statuslist")
+															targetStatus = statusList[j]
+														}
+													}else {break;}
 												}
 												break;
 											case "14":
 												for (var j=i;j<statusList.length;j++){
-													if(currentStatus.stSwing==statusList[j].stSwing && currentStatus.stMode==statusList[j].stMode &&
-														(parseInt(currentStatus.stTemp)-1).toString()==statusList[j].stTemp){
-														console.log("found status in statuslist")
-														targetStatus = statusList[j]
-													}else if(keyid!=statusList[j].keyId){break;}
+													if(keyid==statusList[j].keyId){
+														if(currentStatus.stSwing==statusList[j].stSwing && currentStatus.stMode==statusList[j].stMode &&
+															(parseInt(currentStatus.stTemp)-1).toString()==statusList[j].stTemp){
+															console.log("found status in statuslist")
+															targetStatus = statusList[j]
+														}
+													}else {break;}
 												}
 												break;
 											case "39":break;
@@ -347,6 +361,8 @@ header {
 									}
 								}
 							}
+
+							
 
 							var xhttp2 = new XMLHttpRequest()
 
@@ -369,8 +385,13 @@ header {
 							xhttp2.send(JSON.stringify(data))
 
 							xhttp2.onreadystatechange = function() {
-								//console.log(xhttp.response)
+								
 							}
+
+							vueD.acStatus = targetStatus
+
+							console.log('acStatus')
+							console.log(vueD.acStatus)
 						}
 
 					}
