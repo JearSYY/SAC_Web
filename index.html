@@ -35,6 +35,9 @@
 	top: 50px;
 	right: 50px;
 }
+[v-cloak]{
+	display:none;
+}
 </style>
 </head>
 
@@ -116,7 +119,7 @@
 					<small>Outdoor</small>
 				</div>
 
-				<span>28</span> <span>℃</span>
+				<span id="temp" @click="updateTemp" v-cloak>{{temp}}</span><span>℃</span>
 			</div>
 
 		</div>
@@ -213,7 +216,42 @@
 				userName:primaryData.user.id
 			}
 		})
+
+		
 	};
+
+	vueT = new Vue({
+					el:'#temp',
+					data:{
+						temp:getODTemp()
+					},
+					methods:{
+						updateTemp(){
+							this.temp = getODTemp()
+						}
+					}
+				})
+	
+
+	function getODTemp(){
+		$.ajax({
+			url:'https://data.weather.gov.hk/weatherAPI/opendata/weather.php',
+			type:'GET',
+			
+		
+			timeout:3000,
+			data:{
+				dataType:'rhrread',
+				lang:'en',
+			},
+			
+			success:function(res){
+				console.log(vueT)
+				return vueT.temp = res.temperature.data[1].value
+				
+			}
+		})
+	}
 
 	var choice = {
 		location:0,

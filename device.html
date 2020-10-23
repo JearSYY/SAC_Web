@@ -77,6 +77,12 @@ header {
 .cmd-ctrl-next {
 	bottom: 0;
 }
+.command-text{
+	border: 2px solid rgb(200,200,200);
+	border-radius: 10px;
+	padding:5px 10px;
+
+}
 </style>
 
 </head>
@@ -169,8 +175,8 @@ header {
 
 							<div class="command" v-for="(cmd2,i2) in cmd1">
 								<div class="command-icon-wrapper">
-									<img src="./images/command icon/p off.png" class="command-icon"
-										alt="" @click="sendCommand(i1,i2,i)">
+									<!-- <img src="./images/command icon/p off.png" class="command-icon"
+										alt="" @click="sendCommand(i1,i2,i)"> -->
 								</div>
 								<span class="command-text" v-cloak @click="sendCommand(i1,i2,i)">{{cmd2.keyName}}</span>
 							</div>

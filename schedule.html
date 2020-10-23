@@ -41,6 +41,12 @@
 	color:white;
 }
 
+.enable{
+	color:white;
+	border-radius: 10px;
+	padding:5px 10px;
+}
+
 </style>
 </head>
 
@@ -88,7 +94,8 @@
 							<span style="font-weight: bold;font-size: large;">{{item2.name}}{{console.log(item2.enable)}}</span>
 						</div>
 						<div class="col-1 rgp d-flex justify-content-center align-items-center">
-							<img src="./images/common icon/checked-b.png" alt="" v-if="item2.enable">
+							<span class="enable" v-if="item2.enable" @click="toggleEnable(i1)" style="background-color: rgb(14,176,201);">Enabled</span>
+							<span class="enable" v-if="!item2.enable" @click="toggleEnable(i1)" style="background-color: rgba(92,179,204,0.5);">Disabled</span>
 						</div>
 						<div class="col-7 d-flex align-items-center" style="height:80px;">
 							<div class="rule d-flex justify-content-center align-items-center mx-2" v-for="(item3,i3) in ruleGroupList[i1][i2].rules" v-if="ruleGroupList[i1][i2].rules.length!=0">
@@ -134,6 +141,9 @@
       	locationId: primaryData.locations[choice.location].id,
 			},
 			methods:{
+				toggleEnable(i1){
+					this.ruleGroupList[i1].enable = !this.ruleGroupList[i1].enable
+				},
 				toggleSch(e){
 					var index = $('#sch-indicators span').index(e.currentTarget)
 					console.log(index)
